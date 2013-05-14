@@ -1,0 +1,75 @@
+/* minesweeper.css */
+
+html, body {
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	font-size: 1em;
+	font-family: Arial, Helvetica;
+	padding:1em;
+}
+
+.hide {
+	display:none;
+}
+.invisible {
+	visibility: hidden;
+}
+.ajax-loading {
+	display:inline-block;
+	padding-left:1em;
+}
+
+h1 {
+	margin:0.3em 0;
+}
+
+.board-wrap .row {
+	padding:0;
+	margin:0;
+	height:24px;
+}
+.board-wrap .row .cell {
+	list-style:none;
+	padding:0;
+	margin:0;
+	display:inline-block;
+	width: 18px;
+	height:18px;
+	border:3px outset #AAA;
+	background-color: #C9C9C9;
+	line-height:26px;
+	vertical-align: middle;
+}
+
+.board-wrap .row li:hover {
+	background-color: #DEE6ED;
+}
+
+.board-wrap .row .cell.open {
+}
+
+.board-wrap .row .cell.number,
+.board-wrap .row .cell.open {
+	border:1px solid grey;
+	padding:2px;
+}
+.board-wrap .row .cell.number {
+	background-color: pink;
+}
+.board-wrap .row .cell.flagged {
+	background-color: red;
+}
+.board-wrap .row .cell.question {
+	background-color: lightblue;
+}
+.board-wrap .row .cell.explode {
+	color: red;
+	background-color: white;
+}
+
+.board-wrap .cell.unknown:active {
+	border-style: inset;
+}
