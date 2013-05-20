@@ -1,4 +1,5 @@
-/* MineSweeper.js */
+/* MineSweeper_recursion.js */
+/* included for historical purposes, this is an early version that uses recursion */
 
 jQuery(function($) {
 

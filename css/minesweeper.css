@@ -23,7 +23,17 @@ body {
 }
 
 h1 {
-	margin:0.3em 0;
+	margin:0 0 0.3em 0;
+}
+
+.gh {float:right;}
+
+.board-wrap {
+	-moz-user-select: none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+	user-select: none;
+	cursor: default;
 }
 
 .board-wrap .row {
@@ -40,8 +50,9 @@ h1 {
 	height:18px;
 	border:3px outset #AAA;
 	background-color: #C9C9C9;
-	line-height:26px;
 	vertical-align: middle;
+	text-align: center;
+	line-height: 19px;
 }
 
 .board-wrap .row li:hover {
@@ -55,6 +66,7 @@ h1 {
 .board-wrap .row .cell.open {
 	border:1px solid grey;
 	padding:2px;
+
 }
 .board-wrap .row .cell.number {
 	background-color: pink;
@@ -72,4 +84,11 @@ h1 {
 
 .board-wrap .cell.unknown:active {
 	border-style: inset;
+}
+
+.cell.blown {
+	opacity:1.0;
+}
+.cell.unblown {
+	opacity:0.5;
 }

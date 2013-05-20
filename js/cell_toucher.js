@@ -1,6 +1,78 @@
-/* cell_toucher.js */
+/*
+	cell_toucher.js
+	Author: Michael Butler
+
+	This file is part of Minesweeper.js.
+
+    Minesweeper.js is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Minesweeper.js is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Minesweeper.js.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 var self = this;
+
+function postDebug (obj) {
+	var data = {
+		'type': 'log',
+		'obj': obj
+	};
+	if (self && self.postMessage) {
+		self.postMessage(JSON.stringify(data));
+	}
+}
+
+function get8AdjacentSquares (obj, grid) {
+    var array = [],
+        x = obj.x,
+        y = obj.y;
+
+    //  0  1  2
+    //  3  .  4
+    //  5  6  7
+
+    try {
+        array[0] = grid[y-1][x-1];
+    } catch (e) {}
+    try {
+        array[1] = grid[y-1][x];
+    } catch (e) {}
+    try {
+        array[2] = grid[y-1][x+1];
+    } catch (e) {}
+    try {
+        array[3] = grid[y][x-1];
+    } catch (e) {}
+    try {
+        array[4] = grid[y][x+1];
+    } catch (e) {}
+    try {
+        array[5] = grid[y+1][x-1];
+    } catch (e) {}
+    try {
+        array[6] = grid[y+1][x];
+    } catch (e) {}
+    try {
+        array[7] = grid[y+1][x+1];
+    } catch (e) {}
+
+    var results = [];
+    for (var i = 0; i < 8; i++) {
+        if (array[i]) {
+            results.push(array[i]);
+        }
+    }
+
+    return results;
+}
 
 // Touch all adjacent squares (there are 8)
 // Setting to either a number OR open state
@@ -56,58 +128,32 @@ function touchAdjacent (obj, grid) {
     }
 
     return grid;
-};
-
-function get8AdjacentSquares (obj, grid) {
-    var array = [],
-        x = obj.x,
-        y = obj.y;
-
-    //  0  1  2
-    //  3  .  4
-    //  5  6  7
-
-    try {
-        array[0] = grid[y-1][x-1];
-    } catch(e) {};
-    try {
-        array[1] = grid[y-1][x];
-    } catch(e) {};
-    try {
-        array[2] = grid[y-1][x+1];
-    } catch(e) {};
-    try {
-        array[3] = grid[y][x-1];
-    } catch(e) {};
-    try {
-        array[4] = grid[y][x+1];
-    } catch(e) {};
-    try {
-        array[5] = grid[y+1][x-1];
-    } catch(e) {};
-    try {
-        array[6] = grid[y+1][x];
-    } catch(e) {};
-    try {
-        array[7] = grid[y+1][x+1];
-    } catch(e) {};
-
-    var results = [];
-    for (var i = 0; i < 8; i++) {
-        if (array[i]) {
-            results.push(array[i]);
-        }
-    }
-
-    return results;
-};
+}
 
 function minesweeperCalculateWin (grid) {
-	var win = false;
+	var win = false,
+		mines = 0,
+		closed_cells = 0,
+		y,
+		x,
+		max,
+		max2,
+		obj;
 
+	for (y = 0, max = grid.length; y < max; y++) {
+		for (x = 0, max2 = grid[0].length; x < max2; x++) {
+			obj = grid[y][x];
+			if (obj.mine) {
+				mines += 1;
+			}
+			if (!(obj.state === 'open' || obj.state === 'number')) {
+				closed_cells += 1;
+			}
+		}
+	}
 
-	return win;
-};
+	return (mines === closed_cells);
+}
 
 if (self.document === undefined) {
 	self.addEventListener('message', function (e) {
@@ -116,9 +162,9 @@ if (self.document === undefined) {
 	        cell = {},
 	        grid = {};
 	    data = JSON.parse(data);
+	    grid = data.grid;
 
 	    if (data.type === 'touch_adjacent') {
-		    grid = data.grid;
 		    cell = grid[data.y][data.x];
 		    // This takes 1-2 seconds
 		    grid = touchAdjacent(cell, grid);
