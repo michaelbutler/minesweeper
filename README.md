@@ -7,13 +7,34 @@ A minesweeper game written in JavaScript and rendered with HTML and CSS.
 Features:
 -----------
 + Configurable grid size (X, Y)
-+ Configurable number of mines
++ Configurable mine density
 + Stack based grid traversal algorithm for memory efficiency
 + HTML5 web worker (if supported) will be used to perform the stack algorithm outside of the UI thread
 
 How to use:
 -----------
-Download all files and run `index.html` in a modern web browser.
+Include `minesweep.js` on your jQuery-enabled page and load in a modern web browser.
+
+Example HTML usage:
+-----------
+```
+<!-- requires jQuery -->
+<h1 class="logo">JavaScript MineSweeper
+    <div class="invisible ajax-loading"><img src="load.gif" alt="Processing..."/></div>
+</h1>
+<div id="minesweeper"></div>
+
+<script src="js/MineSweeper.js" type="text/javascript"></script>
+<script>
+    // set a global instance of Minesweeper
+    minesweeper = new MineSweeper();
+    minesweeper.init({
+        selector: '#minesweeper', // the unique element into which the game board will be rendered
+        board_size: [10, 10],  // render a 10w x 10h grid (100 cells)
+        mines: 0.04 // Mine density (4% mines)
+    });
+</script>
+```
 
 License:
 -----------
