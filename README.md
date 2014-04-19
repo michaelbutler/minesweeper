@@ -2,7 +2,7 @@ Minesweeper.js
 ===========
 By Michael Butler
 
-A minesweeper game written in JavaScript and rendered with HTML and CSS.
+A WebWorker powered Minesweeper game written in JavaScript, HTML and CSS.
 
 Features:
 -----------
