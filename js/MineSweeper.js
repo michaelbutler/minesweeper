@@ -155,7 +155,7 @@ jQuery(function ($) {
             if (!self.running) {
                 return;
             }
-            if (obj.state === STATE_OPEN || obj.state === STATE_NUMBER) {
+            if (obj.state === STATE_OPEN || obj.state === STATE_NUMBER || obj.state === STATE_FLAGGED) {
                 // ignore clicks on these
                 return;
             }
