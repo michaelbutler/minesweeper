@@ -36,6 +36,14 @@ Example HTML usage:
 </script>
 ```
 
+To Do:
+-----------
++ Congratulate user when they've won
++ Auto-clear feature to clear multiple squares at once
++ Add a clock
++ Add animation and better graphics
+
+
 License:
 -----------
     Minesweeper.js is free software: you can redistribute it and/or modify
