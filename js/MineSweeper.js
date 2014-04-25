@@ -48,6 +48,7 @@ jQuery(function ($) {
             mines: 18,
             path_to_cell_toucher: 'js/cell_toucher.js'
         };
+        self.RIGHT_MOUSE_CLICKED = false;
 
         this.init = function (options) {
             self.options = $.extend({}, self.defaults, options || {});
@@ -98,6 +99,20 @@ jQuery(function ($) {
                 }
             });
 
+            self.element.on('mousedown', function (ev) {
+                if (ev.which === 3) {
+                    clearTimeout(self.RIGHT_BUTTON_TIMEOUT);
+                    self.RIGHT_MOUSE_CLICKED = true;
+                }
+            });
+            self.element.on('mouseup', function (ev) {
+                if (ev.which === 3) {
+                    self.RIGHT_BUTTON_TIMEOUT = setTimeout(function () {
+                        self.RIGHT_MOUSE_CLICKED = false;
+                    }, 50);
+                }
+            });
+
             self.element.on("contextmenu", ".cell", function (ev) {
                 var targ = $(ev.target);
                 ev.preventDefault();
@@ -110,6 +125,7 @@ jQuery(function ($) {
                 self.clearBoard();
                 self.redrawBoard();
             });
+
         };
 
         /**
@@ -155,7 +171,14 @@ jQuery(function ($) {
             if (!self.running) {
                 return;
             }
-            if (obj.state === STATE_OPEN || obj.state === STATE_NUMBER || obj.state === STATE_FLAGGED) {
+            if (obj.state === STATE_NUMBER) {
+                // auto clear neighbor cells
+                if (self.RIGHT_MOUSE_CLICKED) {
+                    self.magicClearCells(obj);
+                }
+                return;
+            }
+            if (obj.state === STATE_OPEN || obj.state === STATE_FLAGGED) {
                 // ignore clicks on these
                 return;
             }
@@ -364,6 +387,7 @@ jQuery(function ($) {
                 return;
             }
             cell.html('');
+            cell.attr('data-number', '');
             switch (gridobj.state) {
                 case STATE_FLAGGED:
                     cell.addClass('ui-icon ui-icon-flag');
@@ -381,10 +405,12 @@ jQuery(function ($) {
                 case STATE_NUMBER:
                     cell.addClass('number');
                     cell.html(gridobj.number);
+                    cell.attr('data-number', gridobj.number);
                     break;
                 default:
                     throw "Invalid gridobj state: " + gridobj.state;
             }
+
         };
 
         /**
@@ -392,7 +418,6 @@ jQuery(function ($) {
          * @return void
          */
         this.gameOver = function (cellParam) {
-            // todo: handle gameover state
             var width = self.options.board_size[0],
                 height = self.options.board_size[1],
                 x,
@@ -422,6 +447,17 @@ jQuery(function ($) {
         this.winGame = function () {
             self.running = false;
             alert('You win!');
+        };
+
+        this.magicClearCells = function (obj) {
+            $('.ajax-loading').removeClass('invisible');
+            var state = {
+                type: 'get_adjacent', // message type
+                grid: self.grid,
+                x: obj.x,
+                y: obj.y
+            };
+            self.worker.postMessage(JSON.stringify(state));
         };
 
     };
