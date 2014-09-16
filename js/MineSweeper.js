@@ -176,9 +176,13 @@ jQuery(function ($) {
             }
             else if (obj.state === STATE_UNKNOWN) {
                 obj.state = STATE_FLAGGED;
+                var curr = $('#mine_flag_display').val();
+                $('#mine_flag_display').val(curr - 1);
             }
             else if (obj.state === STATE_FLAGGED) {
                 obj.state = STATE_QUESTION;
+                var curr = parseInt( $('#mine_flag_display').val() );
+                $('#mine_flag_display').val(curr + 1);
             }
             else {
                 obj.state = STATE_UNKNOWN;
