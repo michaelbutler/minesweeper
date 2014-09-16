@@ -141,12 +141,14 @@ jQuery(function ($) {
             });
 
             self.element.find('.new-game').click(function (ev) {
+                self.stopTimer();
+                self.timer = '';
                 ev.preventDefault();
                 self.running = true;
                 self.setBoardOptions();
                 self.clearBoard();
                 self.redrawBoard();
-                self.resetDisplays();
+                self.resetDisplays();                
             });
 
             $('#level').change(function(ev) {
@@ -206,6 +208,11 @@ jQuery(function ($) {
             if (!self.running) {
                 return;
             }
+
+            if (!self.timer) {
+                self.startTimer();
+            }
+
             if (obj.state === STATE_NUMBER) {
                 // auto clear neighbor cells
                 if (self.RIGHT_MOUSE_CLICKED) {
@@ -347,6 +354,21 @@ jQuery(function ($) {
 
         }
 
+        this.startTimer = function() {
+            $('#timer').val(0);
+            console.log('starting timer');
+            self.timer = window.setInterval(function() {
+                var curr = parseInt( $('#timer').val() );                
+                $('#timer').val(curr + 1);
+            }, 1000);
+        }
+
+        this.stopTimer = function() {
+            if (self.timer) {
+                window.clearInterval(self.timer);
+            }
+        }
+
         this.resetDisplays = function() {
 
             var level = $('#level option:selected').val()            
@@ -358,7 +380,8 @@ jQuery(function ($) {
                 num_mines = levels[level]['num_mines'];
             }
             
-            $('#mine_flag_display').val(num_mines);                
+            $('#mine_flag_display').val(num_mines);
+            $('#timer').val(0);            
         }
 
         // clear & initialize the internal cell memory grid
@@ -489,6 +512,9 @@ jQuery(function ($) {
          * @return void
          */
         this.gameOver = function (cellParam) {
+
+            self.stopTimer();
+
             var width = self.options.board_size[0],
                 height = self.options.board_size[1],
                 x,
@@ -516,6 +542,7 @@ jQuery(function ($) {
         };
 
         this.winGame = function () {
+            self.stopTimer();
             self.running = false;
             alert('You win!');
         };
