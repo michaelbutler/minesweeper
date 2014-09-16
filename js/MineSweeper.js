@@ -543,8 +543,9 @@ jQuery(function ($) {
 
         this.winGame = function () {
             self.stopTimer();
+            var time = $('#timer').val();
             self.running = false;
-            alert('You win!');
+            alert('You win!\nYour time: ' + time);
         };
 
         this.magicClearCells = function (obj) {
