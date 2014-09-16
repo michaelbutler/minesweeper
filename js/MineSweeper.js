@@ -26,15 +26,18 @@ var MineSweeper;
 levels = {
     'beginner': {
         'board_size': [9, 9],
-        'mines': 10 / (9 * 9)
+        'mines': 10 / (9 * 9),
+        'num_mines': 10
     },
     'intermediate': {
         'board_size': [16, 16],
-        'mines': 40 / (16 * 16)
+        'mines': 40 / (16 * 16),
+        'num_mines', 40
     },
     'expert': {
         'board_size': [30, 16],        
-        'mines': 99 / (30 * 16)
+        'mines': 99 / (30 * 16),
+        'num_mines': 99
     }    
 }
 
