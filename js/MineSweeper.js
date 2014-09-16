@@ -32,7 +32,7 @@ levels = {
     'intermediate': {
         'board_size': [16, 16],
         'mines': 40 / (16 * 16),
-        'num_mines', 40
+        'num_mines': 40
     },
     'expert': {
         'board_size': [30, 16],        
@@ -65,6 +65,7 @@ jQuery(function ($) {
             selector: '#minesweeper',
             board_size: levels.beginner.board_size,
             mines: levels.beginner.mines,
+            num_mines: levels.beginner.num_mines,
             path_to_cell_toucher: 'js/cell_toucher.js'
         };
         self.RIGHT_MOUSE_CLICKED = false;
@@ -86,6 +87,7 @@ jQuery(function ($) {
             self.initWorkers();
             self.clearBoard();
             self.redrawBoard();
+            self.resetDisplays();
             self.initHandlers();
             return self;
         };
@@ -144,6 +146,7 @@ jQuery(function ($) {
                 self.setBoardOptions();
                 self.clearBoard();
                 self.redrawBoard();
+                self.resetDisplays();
             });
 
             $('#level').change(function(ev) {
@@ -327,10 +330,31 @@ jQuery(function ($) {
             if (level == 'custom') {
                 var dim_x = parseInt( $('#dim_x').val() );
                 var dim_y = parseInt( $('#dim_y').val() );
-                self.options.board_size = [dim_x, dim_y];                
+                var num_mines = parseInt( $('#num_mines').val() );
+
+                self.options.board_size = [dim_x, dim_y];
+                self.options.num_mines = num_mines;
+                self.options.mines = num_mines / (dim_x * dim_y);
             } else {
                 self.options.board_size = levels[level]['board_size'];
+                self.options.num_mines = levels[level]['num_mines'];
+                self.options.mines = levels[level]['mines'];
             }
+
+        }
+
+        this.resetDisplays = function() {
+
+            var level = $('#level option:selected').val()            
+            var num_mines;
+
+            if (level == 'custom') {
+                num_mines = $('#num_mines').val();
+            } else {
+                num_mines = levels[level]['num_mines'];
+            }
+            
+            $('#mine_flag_display').val(num_mines);                
         }
 
         // clear & initialize the internal cell memory grid
@@ -510,7 +534,7 @@ jQuery(function ($) {
                 'settings':
                     '<div id="game_settings"><select id="level"><option value="beginner">Beginner</option><option value="intermediate">Intermediate</option><option value="expert">Expert</option><option value="custom">Custom</option></select>    <input type="text" id="dim_x" placeholder="x" size="5" disabled /><input type="text" id="dim_y" placeholder="y" size="5" disabled /><input type="text" id="num_mines" placeholder="mines" size="5" disabled /></div>',
                 'status':
-                    '<div class="game_status"><label>Time:</label><input type="text" id="timer" size="6" value="0" disabled /><label>Mines:</label><input type="text" id="mines" size="6" value="10" disabled />'
+                    '<div class="game_status"><label>Time:</label><input type="text" id="timer" size="6" value="0" disabled /><label>Mines:</label><input type="text" id="mine_flag_display" size="6" value="10" disabled />'
             }
 
             return templates[template];
