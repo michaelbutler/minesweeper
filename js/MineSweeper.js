@@ -334,6 +334,7 @@ jQuery(function ($) {
             // Insert the board cells in DOM
             if (!self.board) {
                 self.element.html('');
+                self.element.append(self.get_template('settings'));
                 self.element.append(self.get_template('actions'));
                 self.element.append('<div class="board-wrap"></div>');
                 self.board = self.element.find('.board-wrap');                
