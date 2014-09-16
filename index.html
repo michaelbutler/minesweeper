@@ -24,11 +24,9 @@
     jQuery(function ($) {
         // set a global instance of Minesweeper
         minesweeper = new MineSweeper();
-        minesweeper.init({
-            selector: '#minesweeper',
-            board_size: [30, 20],
-            mines: 0.05
-        });
+
+        // init the (first) game
+        minesweeper.init();
     });
 </script>
 </body>

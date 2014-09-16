@@ -22,6 +22,22 @@
 
 var MineSweeper;
 
+// standard level configurations
+levels = {
+    'beginner': {
+        'board_size': [9, 9],
+        'mines': 10 / (9 * 9)
+    },
+    'intermediate': {
+        'board_size': [16, 16],
+        'mines': 40 / (16 * 16)
+    },
+    'expert': {
+        'board_size': [30, 16],        
+        'mines': 99 / (30 * 16)
+    }    
+}
+
 jQuery(function ($) {
     'use strict';
 
@@ -44,8 +60,8 @@ jQuery(function ($) {
         self.running = true;
         self.defaults = {
             selector: '#minesweeper',
-            board_size: [20, 20],
-            mines: 18,
+            board_size: levels.beginner.board_size,
+            mines: levels.beginner.mines,
             path_to_cell_toucher: 'js/cell_toucher.js'
         };
         self.RIGHT_MOUSE_CLICKED = false;
