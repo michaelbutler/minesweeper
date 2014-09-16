@@ -334,9 +334,9 @@ jQuery(function ($) {
             // Insert the board cells in DOM
             if (!self.board) {
                 self.element.html('');
-                self.element.append('<div class="board-wrap"></div>');
-                self.board = self.element.find('.board-wrap');
                 self.element.append(self.get_template('new-game-button'));
+                self.element.append('<div class="board-wrap"></div>');
+                self.board = self.element.find('.board-wrap');                
                 self.board.attr('unselectable', 'on')
                     .css('UserSelect', 'none')
                     .css('MozUserSelect', 'none');
@@ -476,10 +476,13 @@ jQuery(function ($) {
             self.worker.postMessage(JSON.stringify(state));
         };
 
-        this.get_template(template) {
+        this.get_template = function(template) {
             var templates = {
-                'new-game-button': '<button class="new-game">New Game</button>'
+                'new-game-button':
+                    '<div class="game_actions"><button class="new-game">New Game</button></div>'
             }
+
+            return templates[template];
         }
 
     };
