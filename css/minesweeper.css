@@ -111,3 +111,7 @@ h1 {
 .cell[data-number="3"] {
    color: red;
 }
+
+.game_settings, .game_actions, .game_status {
+   margin: 10px 0;
+}
