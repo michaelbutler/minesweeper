@@ -142,6 +142,14 @@ jQuery(function ($) {
                 self.redrawBoard();
             });
 
+            $('#level').change(function(ev) {
+                if ($('#level option:selected').val() == 'custom') {
+                    $('#game_settings input').prop('disabled', false);
+                } else {
+                    $('#game_settings input').prop('disabled', true);
+                }
+            });
+
         };
 
         /**
