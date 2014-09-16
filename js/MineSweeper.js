@@ -334,7 +334,7 @@ jQuery(function ($) {
             // Insert the board cells in DOM
             if (!self.board) {
                 self.element.html('');
-                self.element.append(self.get_template('new-game-button'));
+                self.element.append(self.get_template('actions'));
                 self.element.append('<div class="board-wrap"></div>');
                 self.board = self.element.find('.board-wrap');                
                 self.board.attr('unselectable', 'on')
@@ -478,8 +478,10 @@ jQuery(function ($) {
 
         this.get_template = function(template) {
             var templates = {
-                'new-game-button':
-                    '<div class="game_actions"><button class="new-game">New Game</button></div>'
+                'actions':
+                    '<div class="game_actions"><button class="new-game">New Game</button></div>',
+                'settings':
+                    '<div id="settings"><select id="level"><option value="beginner">Beginner</option><option value="intermediate">Intermediate</option><option value="expert">Expert</option><option value="custom">Custom</option></select>    <input type="text" id="dim_x" placeholder="x" size="5" disabled /><input type="text" id="dim_y" placeholder="y" size="5" disabled /><input type="text" id="num_mines" placeholder="mines" size="5" disabled /></div>'
             }
 
             return templates[template];
