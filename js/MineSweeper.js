@@ -336,6 +336,7 @@ jQuery(function ($) {
                 self.element.html('');
                 self.element.append(self.get_template('settings'));
                 self.element.append(self.get_template('actions'));
+                self.element.append(self.get_template('status'));
                 self.element.append('<div class="board-wrap"></div>');
                 self.board = self.element.find('.board-wrap');                
                 self.board.attr('unselectable', 'on')
@@ -480,9 +481,11 @@ jQuery(function ($) {
         this.get_template = function(template) {
             var templates = {
                 'actions':
-                    '<div class="game_actions"><button class="new-game">New Game</button></div>',
+                    '<div class="game_actions"><button class="new-game">New Game</button><button id="reset_game">Best times</button></div>',
                 'settings':
-                    '<div id="settings"><select id="level"><option value="beginner">Beginner</option><option value="intermediate">Intermediate</option><option value="expert">Expert</option><option value="custom">Custom</option></select>    <input type="text" id="dim_x" placeholder="x" size="5" disabled /><input type="text" id="dim_y" placeholder="y" size="5" disabled /><input type="text" id="num_mines" placeholder="mines" size="5" disabled /></div>'
+                    '<div id="game_settings"><select id="level"><option value="beginner">Beginner</option><option value="intermediate">Intermediate</option><option value="expert">Expert</option><option value="custom">Custom</option></select>    <input type="text" id="dim_x" placeholder="x" size="5" disabled /><input type="text" id="dim_y" placeholder="y" size="5" disabled /><input type="text" id="num_mines" placeholder="mines" size="5" disabled /></div>',
+                'status':
+                    '<div class="game_status"><label>Time:</label><input type="text" id="timer" size="6" value="0" disabled /><label>Mines:</label><input type="text" id="mines" size="6" value="10" disabled />'
             }
 
             return templates[template];
