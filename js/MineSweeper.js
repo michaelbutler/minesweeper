@@ -543,10 +543,31 @@ jQuery(function ($) {
 
         this.winGame = function () {
             self.stopTimer();
-            var time = $('#timer').val();
             self.running = false;
+            var time = $('#timer').val();
             alert('You win!\nYour time: ' + time);
+            self.checkBestTime(time);
         };
+
+        this.checkBestTime = function(time) {
+            
+            var level = $('#level').val();
+            
+            if (level != 'custom') {
+                var best_time = localStorage.getItem('best_time_' + level);
+                
+                if ( !best_time || parseInt(time) < parseInt(best_time) ) {
+                    var display_name = localStorage.getItem(level + '_record_holder')
+                    if (!display_name) {
+                        display_name = 'Your name';
+                    }
+                    var name = window.prompt('Congrats! You beat the best ' + level + ' time!', display_name);
+                    
+                    localStorage.setItem('best_time_' + level, time);
+                    localStorage.setItem(level + '_record_holder', name);
+                }
+            }
+        }        
 
         this.magicClearCells = function (obj) {
             $('.ajax-loading').removeClass('invisible');
