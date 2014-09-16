@@ -159,6 +159,16 @@ jQuery(function ($) {
                 }
             });
 
+            $('#best_times').click(function(ev) {
+                var beginner_time = localStorage.getItem('best_time_beginner') || '***';
+                var intermediate_time = localStorage.getItem('best_time_intermediate') || '***' ;
+                var expert_time = localStorage.getItem('best_time_expert') || '***';
+                var beginner_name = localStorage.getItem('beginner_record_holder') || '***';
+                var intermediate_name = localStorage.getItem('intermediate_record_holder') || '***' ;
+                var expert_name = localStorage.getItem('expert_record_holder') || '***';
+                alert("Best times:\nBeginner:\t" + beginner_name + "\t" + beginner_time + "\nIntermediate:\t" + intermediate_name + "\t" + intermediate_time + "\nExpert:\t" + expert_name + "\t" + expert_time);
+            });
+
         };
 
         /**
@@ -583,7 +593,7 @@ jQuery(function ($) {
         this.get_template = function(template) {
             var templates = {
                 'actions':
-                    '<div class="game_actions"><button class="new-game">New Game</button><button id="reset_game">Best times</button></div>',
+                    '<div class="game_actions"><button class="new-game">New Game</button><button id="best_times">Best times</button></div>',
                 'settings':
                     '<div class="game_settings"><select id="level"><option value="beginner">Beginner</option><option value="intermediate">Intermediate</option><option value="expert">Expert</option><option value="custom">Custom</option></select>    <input type="text" id="dim_x" placeholder="x" size="5" disabled /><input type="text" id="dim_y" placeholder="y" size="5" disabled /><input type="text" id="num_mines" placeholder="mines" size="5" disabled /></div>',
                 'status':
