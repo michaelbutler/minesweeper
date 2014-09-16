@@ -336,7 +336,7 @@ jQuery(function ($) {
                 self.element.html('');
                 self.element.append('<div class="board-wrap"></div>');
                 self.board = self.element.find('.board-wrap');
-                self.element.append('<button class="new-game">New Game</button>');
+                self.element.append(self.get_template('new-game-button'));
                 self.board.attr('unselectable', 'on')
                     .css('UserSelect', 'none')
                     .css('MozUserSelect', 'none');
@@ -475,6 +475,12 @@ jQuery(function ($) {
             };
             self.worker.postMessage(JSON.stringify(state));
         };
+
+        this.get_template(template) {
+            var templates = {
+                'new-game-button': '<button class="new-game">New Game</button>'
+            }
+        }
 
     };
 });
