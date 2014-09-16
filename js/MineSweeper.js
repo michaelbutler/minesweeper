@@ -138,6 +138,7 @@ jQuery(function ($) {
             self.element.find('.new-game').click(function (ev) {
                 ev.preventDefault();
                 self.running = true;
+                self.setBoardOptions();
                 self.clearBoard();
                 self.redrawBoard();
             });
@@ -315,6 +316,19 @@ jQuery(function ($) {
 
             return array;
         };
+
+        // set the board size and mine density
+        this.setBoardOptions = function() {
+            var level = $('#level').val();
+
+            if (level == 'custom') {
+                var dim_x = parseInt( $('#dim_x').val() );
+                var dim_y = parseInt( $('#dim_y').val() );
+                self.options.board_size = [dim_x, dim_y];                
+            } else {
+                self.options.board_size = levels[level]['board_size'];
+            }
+        }
 
         // clear & initialize the internal cell memory grid
         this.clearBoard = function () {
