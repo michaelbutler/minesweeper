@@ -7,13 +7,15 @@ A WebWorker powered Minesweeper game written in JavaScript, HTML and CSS.
 Features:
 -----------
 + Configurable grid size (X, Y)
-+ Configurable mine density
++ User can choose difficulty level
++ Configurable number of mines
++ Stopwatch with score keeping (LocalStorage)
 + Stack based grid traversal algorithm for memory efficiency
 + HTML5 web worker (if supported) will be used to perform the stack algorithm outside of the UI thread
 
 How to use:
 -----------
-Include `minesweep.js` on your jQuery-enabled page and load in a modern web browser.
+Download all the files and open `index.html` in a modern web browser.
 
 Example HTML usage:
 -----------
@@ -28,20 +30,15 @@ Example HTML usage:
 <script>
     // set a global instance of Minesweeper
     minesweeper = new MineSweeper();
-    minesweeper.init({
-        selector: '#minesweeper', // the unique element into which the game board will be rendered
-        board_size: [10, 10],  // render a 10w x 10h grid (100 cells)
-        mines: 0.04 // Mine density (4% mines)
-    });
+    minesweeper.init();
 </script>
 ```
 
 To Do:
 -----------
-+ Congratulate user when they've won
 + Auto-clear feature to clear multiple squares at once
-+ Add a clock
 + Add animation and better graphics
++ Enhance UI for a sleek new look
 
 
 License:
