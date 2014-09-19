@@ -1,6 +1,7 @@
 /*
  cell_toucher.js
  Author: Michael Butler
+ Url: https://github.com/michaelbutler/minesweeper
 
  This file is part of Minesweeper.js.
 
