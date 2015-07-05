@@ -1,86 +1,110 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <title>JavaScript Minesweeper by michaelbutler</title>
-  </head>
+<head>
+	<meta charset='utf-8'>
+	<meta http-equiv="X-UA-Compatible" content="chrome=1">
+	<link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+	<link rel="stylesheet" type="text/css" href="stylesheets/minesweeper.css" media="screen">
+	<link rel="stylesheet" type="text/css" href="stylesheets/smoothness/jquery-ui-1.9.2.custom.min.css" media="screen">
+	<link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+	<link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+	<!--[if lt IE 9]>
+	<script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<title>JavaScript Minesweeper by michaelbutler</title>
+</head>
 
-  <body>
-    <div id="container">
-      <div class="inner">
+<body>
+<div id="container">
+	<div class="inner">
 
-        <header>
-          <h1>JavaScript Minesweeper</h1>
-          <h2>WebWorker powered Minesweeper game written in JavaScript, HTML and CSS.</h2>
-        </header>
+		<header>
+			<h1>JavaScript Minesweeper</h1>
 
-        <section id="downloads" class="clearfix">
-          <a href="https://github.com/michaelbutler/minesweeper/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
-          <a href="https://github.com/michaelbutler/minesweeper/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
-          <a href="https://github.com/michaelbutler/minesweeper" id="view-on-github" class="button"><span>View on GitHub</span></a>
-        </section>
+			<h2>WebWorker powered Minesweeper game written in JavaScript, HTML and CSS.</h2>
+		</header>
 
-        <hr>
+		<section id="downloads" class="clearfix">
+			<a href="https://github.com/michaelbutler/minesweeper/zipball/master" id="download-zip"
+			   class="button"><span>Download .zip</span></a>
+			<a href="https://github.com/michaelbutler/minesweeper/tarball/master" id="download-tar-gz"
+			   class="button"><span>Download .tar.gz</span></a>
+			<a href="https://github.com/michaelbutler/minesweeper" id="view-on-github" class="button"><span>View on GitHub</span></a>
+		</section>
 
-        <section id="main_content">
-          <h1>
-<a id="minesweeperjs" class="anchor" href="#minesweeperjs" aria-hidden="true"><span class="octicon octicon-link"></span></a>Minesweeper.js</h1>
+		<hr>
 
-<p>A WebWorker powered Minesweeper game written in JavaScript, HTML and CSS.</p>
+		<section id="main_content">
+			<h1 class="logo">
+				<span class="invisible ajax-loading"><img src="load.gif" alt="Processing..."/></span>
+				<a id="minesweeperjs" class="anchor" href="#minesweeperjs" aria-hidden="true"><span
+						class="octicon octicon-link"></span></a>Minesweeper.js
+			</h1>
 
-<h2>
-<a id="features" class="anchor" href="#features" aria-hidden="true"><span class="octicon octicon-link"></span></a>Features:</h2>
+			<p>A WebWorker powered Minesweeper game written in JavaScript, HTML and CSS.</p>
 
-<ul>
-<li>Configurable grid size (X, Y)</li>
-<li>User can choose difficulty level</li>
-<li>Configurable number of mines</li>
-<li>Stopwatch with score keeping (LocalStorage)</li>
-<li>Stack based grid traversal algorithm for memory efficiency</li>
-<li>HTML5 web worker (if supported) will be used to perform the stack algorithm outside of the UI thread</li>
-</ul>
 
-<h2>
-<a id="how-to-use" class="anchor" href="#how-to-use" aria-hidden="true"><span class="octicon octicon-link"></span></a>How to use:</h2>
 
-<p>Download all the files and open <code>index.html</code> in a modern web browser.</p>
+			<div id="minesweeper" class="game-board"></div>
 
-<h2>
-<a id="example-html-usage" class="anchor" href="#example-html-usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Example HTML usage:</h2>
+
+
+			<h2>
+				<a id="features" class="anchor" href="#features" aria-hidden="true"><span
+						class="octicon octicon-link"></span></a>Features:</h2>
+
+			<ul>
+				<li>Configurable grid size (X, Y)</li>
+				<li>User can choose difficulty level</li>
+				<li>Configurable number of mines</li>
+				<li>Stopwatch with score keeping (LocalStorage)</li>
+				<li>Stack based grid traversal algorithm for memory efficiency</li>
+				<li>HTML5 web worker (if supported) will be used to perform the stack algorithm outside of the UI
+					thread
+				</li>
+			</ul>
+
+			<h2>
+				<a id="how-to-use" class="anchor" href="#how-to-use" aria-hidden="true"><span
+						class="octicon octicon-link"></span></a>How to use:</h2>
+
+			<p>Download all the files and open <code>index.html</code> in a modern web browser. Due to Javascript security
+			restrictions with loading external scripts, you must serve it from at least a basic web server. For example,
+			navigate to the directory and run <code>php -S localhost:9797</code> then open <code>http://localhost:9797/index.html</code>
+			in a browser. Or with Python, run <code>python -m SimpleHTTPServer 9797</code>.</p>
+
+			<h2>
+				<a id="example-html-usage" class="anchor" href="#example-html-usage" aria-hidden="true"><span
+						class="octicon octicon-link"></span></a>Example HTML usage:</h2>
 
 <pre><code>&lt;!-- requires jQuery --&gt;
 &lt;h1 class="logo"&gt;JavaScript MineSweeper
-    &lt;div class="invisible ajax-loading"&gt;&lt;img src="load.gif" alt="Processing..."/&gt;&lt;/div&gt;
+&lt;div class="invisible ajax-loading"&gt;&lt;img src="load.gif" alt="Processing..."/&gt;&lt;/div&gt;
 &lt;/h1&gt;
 &lt;div id="minesweeper"&gt;&lt;/div&gt;
 
 &lt;script src="js/MineSweeper.js" type="text/javascript"&gt;&lt;/script&gt;
 &lt;script&gt;
-    // set a global instance of Minesweeper
-    minesweeper = new MineSweeper();
-    minesweeper.init();
+// set a global instance of Minesweeper
+minesweeper = new MineSweeper();
+minesweeper.init();
 &lt;/script&gt;
 </code></pre>
 
-<h2>
-<a id="to-do" class="anchor" href="#to-do" aria-hidden="true"><span class="octicon octicon-link"></span></a>To Do:</h2>
+			<h2>
+				<a id="to-do" class="anchor" href="#to-do" aria-hidden="true"><span class="octicon octicon-link"></span></a>To
+				Do:</h2>
 
-<ul>
-<li>Auto-clear feature to clear multiple squares at once</li>
-<li>Add animation and better graphics</li>
-<li>Enhance UI for a sleek new look</li>
-</ul>
+			<ul>
+				<li>Auto-clear feature to clear multiple squares at once</li>
+				<li>Add animation and better graphics</li>
+				<li>Enhance UI for a sleek new look</li>
+			</ul>
 
-<h2>
-<a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License:</h2>
+			<h2>
+				<a id="license" class="anchor" href="#license" aria-hidden="true"><span
+						class="octicon octicon-link"></span></a>License:</h2>
 
 <pre><code>Minesweeper.js is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -89,21 +113,32 @@ the Free Software Foundation, either **version 3** of the License, or
 
 Minesweeper.js is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Minesweeper.js.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
+along with Minesweeper.js. If not, see &lt;http://www.gnu.org/licenses/&gt;.
 </code></pre>
-        </section>
+		</section>
 
-        <footer>
-          JavaScript Minesweeper is maintained by <a href="https://github.com/michaelbutler">michaelbutler</a><br>
-          This page was generated by <a href="https://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
-        </footer>
+		<footer>
+			JavaScript Minesweeper is maintained by <a href="https://github.com/michaelbutler">michaelbutler</a><br>
+			This page was generated by <a href="https://pages.github.com">GitHub Pages</a>. Tactile theme by <a
+				href="https://twitter.com/jasonlong">Jason Long</a>.
+		</footer>
 
-        
-      </div>
-    </div>
-  </body>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+		<script src="javascripts/MineSweeper.js" type="text/javascript"></script>
+		<script>
+			jQuery(function ($) {
+				// set a global instance of Minesweeper
+				minesweeper = new MineSweeper();
+
+				// init the (first) game
+				minesweeper.init();
+			})
+		</script>
+	</div>
+</div>
+</body>
 </html>
