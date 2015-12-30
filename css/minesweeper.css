@@ -94,6 +94,10 @@ h1 {
    border-style: inset;
 }
 
+.board-wrap .cell.test{
+   border-style: inset;
+}
+
 .cell.blown {
    opacity: 1.0;
 }
