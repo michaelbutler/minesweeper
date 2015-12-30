@@ -50,28 +50,31 @@ jQuery(function ($) {
         STATE_FLAGGED = 'flagged',
         STATE_EXPLODE = 'explode',
         STATE_QUESTION = 'question';
+	var LEFT_MB=1,
+		RIGHT_MB=3;
 
     MineSweeper = function () {
         // prevent namespace pollution
         if (!(this instanceof MineSweeper)) {
             throw "Invalid use of Minesweeper";
         }
-        var self = this;
-        self.options = {};
-        self.grid = [];
-        self.running = true;
-        self.defaults = {
+        var msObj = this;
+        this.options = {};
+        this.grid = [];
+        this.running = true;
+        this.defaults = {
             selector: '#minesweeper',
             board_size: levels.beginner.board_size,
             num_mines: levels.beginner.num_mines,
             path_to_cell_toucher: 'js/cell_toucher.js'
         };
-        self.RIGHT_MOUSE_CLICKED = false;
+        this.LEFT_MOUSE_CLICKED = false;
+        this.RIGHT_MOUSE_CLICKED = false;
 
         this.init = function (options) {
-            self.options = $.extend({}, self.defaults, options || {});
-            self.element = $(self.options.selector);
-            if (!self.element.length) {
+            msObj.options = $.extend({}, msObj.defaults, options || {});
+            var msUI = $(msObj.options.selector);
+            if (!msUI.length) {
                 throw "MineSweeper element not found";
             }
             if (!window.JSON) {
@@ -79,86 +82,127 @@ jQuery(function ($) {
             }
             // insert progress animation before the grid
             if ($('.ajax-loading').length < 1) {
-                $('<div class="invisible ajax-loading"></div>')
-                    .prependTo(self.element.parent());
+				msUI.before(
+                '<div class="invisible ajax-loading"></div>'
+				);
             }
-            self.initWorkers();
-            self.clearBoard();
-            self.redrawBoard();
-            self.resetDisplays();
-            self.initHandlers();
-            return self;
+            msObj.initWorkers(msObj.options.path_to_cell_toucher);
+            msObj.clearBoard();
+            msObj.redrawBoard();
+            msObj.resetDisplays();
+            msObj.initHandlers(msUI);
+            return msObj;
         };
 
-        this.initWorkers = function () {
+		this.callWorker = function(task,par) {
+            $('.ajax-loading').removeClass('invisible');
+            var job = {
+                type: task, // message type
+                grid: msObj.grid
+            };
+			if (typeof par === 'number') {
+				job.mines=par;
+			}
+			else if (typeof par === 'object'){
+				job.x=par.x;
+				job.y=par.y;
+			}
+            msObj.worker.postMessage(JSON.stringify(job));
+		};
+
+        this.initWorkers = function (wPath) {
             if (window.Worker) {
                 // Create a background web worker to process the grid "painting" with a stack
-                self.worker = new Worker(self.options.path_to_cell_toucher);
-                self.worker.addEventListener('message', function (e) {
+                msObj.worker = new Worker(wPath);
+                msObj.worker.onmessage= function (e) {
                     var data = JSON.parse(e.data);
-                    self.handleWorkerMessage(data);
-                }, false);
+                    msObj.handleWorkerMessage(data);
+                };
             }
             else {
-                self.worker = null;
+                msObj.worker = null;
                 // for older browsers, load the web worker script in global space to access the functions
-                $.getScript(self.options.path_to_cell_toucher);
+                $.getScript(wPath);
             }
         };
 
-        this.initHandlers = function () {
-            self.element.on('click', '.cell', function (ev) {
-                var targ = $(ev.target);
+        this.initHandlers = function (msUI) {
+
+            msUI.on("contextmenu", ".cell", function (ev) {
                 ev.preventDefault();
-                if (!self.running) {
-                    return;
+            });
+
+            msUI.on('mousedown', function (ev) {
+                if (ev.which === RIGHT_MB) {
+                    clearTimeout(msObj.RIGHT_BUTTON_TIMEOUT);
+                    msObj.RIGHT_MOUSE_DOWN = true;
                 }
-                if (ev.which !== 3) {
-                    self.handleLeftClick(targ);
+                else if (ev.which === LEFT_MB) {
+                    clearTimeout(msObj.LEFT_BUTTON_TIMEOUT);
+                    msObj.LEFT_MOUSE_DOWN = true;
                 }
             });
 
-            self.element.on('mousedown', function (ev) {
-                if (ev.which === 3) {
-                    clearTimeout(self.RIGHT_BUTTON_TIMEOUT);
-                    self.RIGHT_MOUSE_CLICKED = true;
-                }
-            });
-
-            self.element.on('mouseup', function (ev) {
-                if (ev.which === 3) {
-                    self.RIGHT_BUTTON_TIMEOUT = setTimeout(function () {
-                        self.RIGHT_MOUSE_CLICKED = false;
+            msUI.on('mouseup', function (ev) {
+                if (ev.which === RIGHT_MB) {
+                    msObj.RIGHT_BUTTON_TIMEOUT = setTimeout(function () {
+                        msObj.RIGHT_MOUSE_DOWN = false;
+                    }, 50);
+				}
+                else if (ev.which === LEFT_MB) {
+                    msObj.LEFT_BUTTON_TIMEOUT = setTimeout(function () {
+                        msObj.LEFT_MOUSE_DOWN = false;
                     }, 50);
                 }
             });
 
-            self.element.on("contextmenu", ".cell", function (ev) {
+            msUI.on('mousedown','.cell', function (ev) {
                 var targ = $(ev.target);
-                ev.preventDefault();
-                self.handleRightClick(targ);
+                if ((ev.which === LEFT_MB&&msObj.RIGHT_MOUSE_DOWN)||
+					(ev.which === RIGHT_MB&&msObj.LEFT_MOUSE_DOWN)) {
+						var x = targ.attr('data-x')-1;
+						var ud=targ.parent().prev();
+						for(var i=x;i<x+3;i++)
+							ud.children(".unknown.[data-x="+i+"]").addClass('test');
+						targ.prev('.unknown').addClass('test');
+						targ.next('.unknown').addClass('test');
+						ud=targ.parent().next();
+						for(var i=x;i<x+3;i++)
+							ud.children(".unknown.[data-x="+i+"]").addClass('test');
+				}
             });
 
-            self.element.find('.new-game').click(function (ev) {
-                ev.preventDefault();
-                self.stopTimer();
-                self.timer = '';
-                self.running = true;
-                self.setBoardOptions();
-                self.clearBoard();
-                self.redrawBoard();
-                self.resetDisplays();
+            msUI.on('mouseup','.cell', function (ev) {
+                var targ = $(ev.target);
+                if (ev.which === LEFT_MB) {
+                    msObj.handleLeftClick(targ);
+				}
+				else if (ev.which === RIGHT_MB) {
+                    msObj.handleRightClick(targ);
+				}
             });
 
-            $('#level').change(function (ev) {
+            $('.new-game').on("click",function (ev) {
+                ev.preventDefault();
+                msObj.stopTimer();
+                msObj.timer = '';
+                msObj.running = true;
+                msObj.setBoardOptions();
+                msObj.clearBoard();
+                msObj.redrawBoard();
+                msObj.resetDisplays();
+            });
+
+            $('#level').on("change",function (ev) {
                 if ($('#level option:selected').val() === 'custom') {
                     $('.game_settings input').prop('disabled', false);
                 } else {
                     $('.game_settings input').prop('disabled', true);
                 }
+				$('.new-game').trigger('click');
             });
 
-            $('#best_times').click(function (ev) {
+            $('#best_times').on("click",function (ev) {
                 var beginner_time = localStorage.getItem('best_time_beginner') || '***';
                 var intermediate_time = localStorage.getItem('best_time_intermediate') || '***';
                 var expert_time = localStorage.getItem('best_time_expert') || '***';
@@ -178,29 +222,38 @@ jQuery(function ($) {
             if (!(cell instanceof jQuery)) {
                 throw "Parameter must be jQuery instance";
             }
-            if (!self.running) {
+            if (!msObj.running) {
                 return;
             }
-            var obj = self.getCellObj(cell),
-                flagDisplay = $('#mine_flag_display'),
-                curr;
-            if (obj.state === STATE_OPEN || obj.state === STATE_NUMBER) {
+            var obj = msObj.getCellObj(cell);
+
+            if (obj.state === STATE_NUMBER) {
+                // auto clear neighbor cells
+				if (msObj.LEFT_MOUSE_DOWN) {
+					msObj.callWorker('get_adjacent',obj);
+				}
                 return;
             }
-            else if (obj.state === STATE_UNKNOWN) {
-                obj.state = STATE_FLAGGED;
-                curr = parseInt(flagDisplay.val(), 10);
-                flagDisplay.val(curr - 1);
+
+            if (obj.state === STATE_NUMBER) {
+                return;
             }
-            else if (obj.state === STATE_FLAGGED) {
-                obj.state = STATE_QUESTION;
-                curr = parseInt(flagDisplay.val(), 10);
-                flagDisplay.val(curr + 1);
-            }
-            else {
+            if (obj.state === STATE_QUESTION) {
                 obj.state = STATE_UNKNOWN;
+			}
+			else {
+				var flagDisplay = $('#mine_flag_display'),
+					curr = parseInt(flagDisplay.val(), 10);
+				if (obj.state === STATE_UNKNOWN) {
+					obj.state = STATE_FLAGGED;
+					flagDisplay.val(curr - 1);
+				}
+				else if (obj.state === STATE_FLAGGED) {
+					obj.state = STATE_QUESTION;
+					flagDisplay.val(curr + 1);
+				}
             }
-            self.drawCell(cell);
+            msObj.drawCell(cell);
         };
 
         /**
@@ -213,64 +266,60 @@ jQuery(function ($) {
             if (!(cell instanceof jQuery)) {
                 throw "Parameter must be jQuery instance";
             }
-            var obj = self.getCellObj(cell);
-            if (!self.running) {
+            if (!msObj.running) {
                 return;
             }
-
-            if (!self.timer) {
-                self.startTimer();
+            if (!msObj.timer) {
+                msObj.startTimer();
             }
 
-            if (obj.state === STATE_NUMBER) {
-                // auto clear neighbor cells
-                if (self.RIGHT_MOUSE_CLICKED) {
-                    self.magicClearCells(obj);
-                }
-                return;
-            }
+            var obj = msObj.getCellObj(cell);
             if (obj.state === STATE_OPEN || obj.state === STATE_FLAGGED) {
                 // ignore clicks on these
                 return;
             }
-            if (obj.mine) {
-                // game over
-                self.gameOver(cell);
+            if (obj.state === STATE_NUMBER) {
+                // auto clear neighbor cells
+				if (msObj.RIGHT_MOUSE_DOWN) {
+					msObj.callWorker('get_adjacent',obj);
+				}
                 return;
             }
 
-            var state = {
-                type: 'touch_adjacent', // message type
-                grid: self.grid,
-                x: obj.x,
-                y: obj.y
-            };
+            if (obj.mine) {
+                // game over
+                msObj.gameOver(cell);
+                return;
+            }
 
-            if (self.worker) {
+            if (msObj.worker) {
                 // Asynchronously
-                $('.ajax-loading').removeClass('invisible');
-                self.worker.postMessage(JSON.stringify(state));
+				msObj.callWorker('touch_adjacent',obj);
             }
             else {
                 // Synchronously
                 if (!window.touchAdjacent) {
-                    throw ("Could not load " + self.options.path_to_cell_toucher);
+                    throw ("Could not load " + msObj.options.path_to_cell_toucher);
                 }
-                self.grid = touchAdjacent(obj, self.grid);
+                msObj.grid = touchAdjacent(obj, msObj.grid);
                 // redraw board from memory representation
-                self.redrawBoard();
+                msObj.redrawBoard();
             }
         };
 
         this.handleWorkerMessage = function (data) {
-            if (data.type === 'touch_adjacent') {
-                self.grid = data.grid;
-                self.redrawBoard();
+			if (data.type === 'touch_adjacent'||data.type === 'get_adjacent') {
+                msObj.grid = data.grid;
+                msObj.redrawBoard();
             }
-            else if (data.type === 'calc_win') {
+			else if (data.type === 'calc_win') {
                 if (data.win) {
-                    self.winGame();
+                    msObj.winGame();
                 }
+            }
+			else if (data.type === 'explode') {
+                var cell = msObj.getJqueryObject(data.cell.x,data.cell.y);
+				msObj.gameOver(cell);
             }
             else if (data.type === 'log') {
                 if (console && console.log) {
@@ -288,7 +337,7 @@ jQuery(function ($) {
             try {
                 x = parseInt(dom_obj.attr('data-x'), 10);
                 y = parseInt(dom_obj.attr('data-y'), 10);
-                gridobj = self.grid[y][x];
+                gridobj = msObj.grid[y][x];
             }
             catch (e) {
                 console.warn("Could not find memory representation for:");
@@ -299,15 +348,15 @@ jQuery(function ($) {
             return gridobj;
         };
 
-        this.getJqueryObject = function (obj) {
-            return self.board.find('.cell[data-coord="' + [obj.x, obj.y].join(',') + '"]');
+        this.getJqueryObject = function (x,y) {
+            return msObj.board.find('.cell[data-coord="' + [x, y].join(',') + '"]');
         };
 
         this.getRandomMineArray = function () {
-            var width = self.options.board_size[0],
-                height = self.options.board_size[1],
+            var width = msObj.options.board_size[0],
+                height = msObj.options.board_size[1],
             // Total Mines is a percentage of the total number of cells
-                total_mines = self.options.num_mines,
+                total_mines = msObj.options.num_mines,
                 array = [],
                 x,
                 max;
@@ -352,11 +401,11 @@ jQuery(function ($) {
                 var dim_y = parseInt($('#dim_y').val(), 10);
                 var num_mines = parseInt($('#num_mines').val(), 10);
 
-                self.options.board_size = [dim_x, dim_y];
-                self.options.num_mines = num_mines;
+                msObj.options.board_size = [dim_x, dim_y];
+                msObj.options.num_mines = num_mines;
             } else {
-                self.options.board_size = levels[level].board_size;
-                self.options.num_mines = levels[level].num_mines;
+                msObj.options.board_size = levels[level].board_size;
+                msObj.options.num_mines = levels[level].num_mines;
             }
 
         };
@@ -365,15 +414,15 @@ jQuery(function ($) {
             var timerElement = $('#timer');
             timerElement.val(0);
             console.log('starting timer');
-            self.timer = window.setInterval(function () {
+            msObj.timer = window.setInterval(function () {
                 var curr = parseInt(timerElement.val(), 10);
                 timerElement.val(curr + 1);
             }, 1000);
         };
 
         this.stopTimer = function () {
-            if (self.timer) {
-                window.clearInterval(self.timer);
+            if (msObj.timer) {
+                window.clearInterval(msObj.timer);
             }
         };
 
@@ -394,18 +443,18 @@ jQuery(function ($) {
 
         // clear & initialize the internal cell memory grid
         this.clearBoard = function () {
-            var width = self.options.board_size[0],
-                height = self.options.board_size[1],
+            var width = msObj.options.board_size[0],
+                height = msObj.options.board_size[1],
                 x,
                 y,
                 z = 0,
-                mine_hat = self.getRandomMineArray();
+                mine_hat = msObj.getRandomMineArray();
 
-            self.grid = [];
+            msObj.grid = [];
             for (y = 0; y < height; y++) {
-                self.grid[y] = [];
+                msObj.grid[y] = [];
                 for (x = 0; x < width; x++) {
-                    self.grid[y][x] = {
+                    msObj.grid[y][x] = {
                         'state': STATE_UNKNOWN,
                         'number': 0,
                         'mine': mine_hat[z++],
@@ -416,19 +465,20 @@ jQuery(function ($) {
             }
 
             // Insert the board cells in DOM
-            if (!self.board) {
-                self.element.html('');
-                self.element.append(self.get_template('settings'));
-                self.element.append(self.get_template('actions'));
-                self.element.append(self.get_template('status'));
-                self.element.append('<div class="board-wrap"></div>');
-                self.board = self.element.find('.board-wrap');
-                self.board.attr('unselectable', 'on')
+            if (!msObj.board) {
+                $(msObj.options.selector)
+					.html('')
+					.append(msObj.get_template('settings'))
+					.append(msObj.get_template('actions'))
+					.append(msObj.get_template('status'))
+					.append('<div class="board-wrap"></div>');
+                msObj.board = $('.board-wrap');
+                msObj.board.attr('unselectable', 'on')
                     .css('UserSelect', 'none')
                     .css('MozUserSelect', 'none');
             }
             else {
-                self.board.html('');
+                msObj.board.html('');
             }
             for (y = 0; y < height; y++) {
                 var row = $('<ul class="row" data-index=' + y + '></ul>');
@@ -436,53 +486,50 @@ jQuery(function ($) {
                     var cell;
                     row.append('<li class="cell" data-coord="' + [x, y].join(',') + '" data-x=' + x + ' data-y=' + y + '>x</li>');
                     cell = row.find('.cell:last');
-                    self.drawCell(cell);
+                    msObj.drawCell(cell);
                 }
-                self.board.append(row);
+                msObj.board.append(row);
             }
 
 
         };
 
         this.redrawBoard = function () {
-            self.board.find('li.cell').each(function (ind, cell) {
-                self.drawCell($(cell));
+            msObj.board.find('li.cell').each(function (ind, cell) {
+                msObj.drawCell($(cell));
             });
 
-            if (self.worker) {
-                var state = {
-                    type: 'calc_win', // message type
-                    grid: self.grid
-                };
-                self.worker.postMessage(JSON.stringify(state));
+            if (msObj.worker) {
+				msObj.callWorker('calc_win',msObj.options.num_mines);
             }
             else {
                 if (!window.touchAdjacent) {
-                    throw ("Could not load " + self.options.path_to_cell_toucher);
+                    throw ("Could not load " + msObj.options.path_to_cell_toucher);
                 }
-                var win = minesweeperCalculateWin(self.grid);
+                var win = minesweeperCalculateWin(msObj.grid);
                 if (win) {
-                    self.winGame();
+                    msObj.winGame();
                 }
             }
         };
+
 
         this.drawCell = function (x, y) {
             var cell = null,
                 gridobj;
             if (x instanceof jQuery) {
                 cell = x;
+				x = parseInt(cell.attr('data-x'), 10);
+				y = parseInt(cell.attr('data-y'), 10);
             }
             else if (typeof x === 'number' && typeof y === 'number') {
-                cell = self.board.find('.cell[data-coord="' + [x, y].join(',') + '"]');
+                cell = getJqueryObject(x,y);
             }
-            x = parseInt(cell.attr('data-x'), 10);
-            y = parseInt(cell.attr('data-y'), 10);
 
             cell.removeClass().addClass('cell');
 
             try {
-                gridobj = self.grid[y][x];
+                gridobj = msObj.grid[y][x];
             }
             catch (e) {
                 console.warn("Invalid grid coord: x,y = " + [x, y].join(','));
@@ -497,8 +544,6 @@ jQuery(function ($) {
                     break;
                 case STATE_QUESTION:
                     cell.addClass('ui-icon ui-icon-help');
-                    cell.addClass(gridobj.state);
-                    break;
                 case STATE_UNKNOWN:
                 case STATE_OPEN:
                 case STATE_EXPLODE:
@@ -521,10 +566,10 @@ jQuery(function ($) {
          */
         this.gameOver = function (cellParam) {
 
-            self.stopTimer();
+            msObj.stopTimer();
 
-            var width = self.options.board_size[0],
-                height = self.options.board_size[1],
+            var width = msObj.options.board_size[0],
+                height = msObj.options.board_size[1],
                 x,
                 y;
 
@@ -534,9 +579,8 @@ jQuery(function ($) {
             }
             for (y = 0; y < height; y++) {
                 for (x = 0; x < width; x++) {
-                    var obj = self.grid[y][x],
-                        cell;
-                    cell = self.getJqueryObject(obj);
+                    var obj = msObj.grid[y][x],
+                        cell= msObj.getJqueryObject(x,y);
                     if (obj.mine) {
                         cell.removeClass('ui-icon-help')
                             .addClass('ui-icon ui-icon-close blown');
@@ -546,15 +590,15 @@ jQuery(function ($) {
                     }
                 }
             }
-            self.running = false;
+            msObj.running = false;
         };
 
         this.winGame = function () {
-            self.stopTimer();
-            self.running = false;
+            msObj.stopTimer();
+            msObj.running = false;
             var time = $('#timer').val();
             alert('You win!\nYour time: ' + time);
-            self.checkBestTime(time);
+            msObj.checkBestTime(time);
         };
 
         this.checkBestTime = function (time) {
@@ -575,21 +619,10 @@ jQuery(function ($) {
             }
         };
 
-        this.magicClearCells = function (obj) {
-            $('.ajax-loading').removeClass('invisible');
-            var state = {
-                type: 'get_adjacent', // message type
-                grid: self.grid,
-                x: obj.x,
-                y: obj.y
-            };
-            self.worker.postMessage(JSON.stringify(state));
-        };
-
         this.get_template = function (template) {
             var templates = {
-                'actions': '<div class="game_actions"><button class="new-game">New Game</button><button id="best_times">Best times</button></div>',
                 'settings': '<div class="game_settings"><select id="level"><option value="beginner">Beginner</option><option value="intermediate">Intermediate</option><option value="expert">Expert</option><option value="custom">Custom</option></select>    <input type="text" id="dim_x" placeholder="x" size="5" disabled /><input type="text" id="dim_y" placeholder="y" size="5" disabled /><input type="text" id="num_mines" placeholder="mines" size="5" disabled /></div>',
+                'actions': '<div class="game_actions"><button class="new-game">New Game</button><button id="best_times">Best times</button></div>',
                 'status': '<div class="game_status"><label>Time:</label><input type="text" id="timer" size="6" value="0" readonly /><label>Mines:</label><input type="text" id="mine_flag_display" size="6" value="10" disabled />'
             };
 
