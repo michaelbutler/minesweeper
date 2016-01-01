@@ -50,8 +50,8 @@ jQuery(function ($) {
         STATE_FLAGGED = 'flagged',
         STATE_EXPLODE = 'explode',
         STATE_QUESTION = 'question';
-	var LEFT_MB=1,
-		RIGHT_MB=3;
+    var LEFT_MOUSE_BUTTON = 1,
+        RIGHT_MOUSE_BUTTON = 3;
 
     MineSweeper = function () {
         // prevent namespace pollution
@@ -82,9 +82,9 @@ jQuery(function ($) {
             }
             // insert progress animation before the grid
             if ($('.ajax-loading').length < 1) {
-				msUI.before(
+                msUI.before(
                 '<div class="invisible ajax-loading"></div>'
-				);
+                );
             }
             msObj.initWorkers(msObj.options.path_to_cell_toucher);
             msObj.clearBoard();
@@ -94,27 +94,27 @@ jQuery(function ($) {
             return msObj;
         };
 
-		this.callWorker = function(task,par) {
+        this.callWorker = function(task,par) {
             $('.ajax-loading').removeClass('invisible');
             var job = {
                 type: task, // message type
                 grid: msObj.grid
             };
-			if (typeof par === 'number') {
-				job.mines=par;
-			}
-			else if (typeof par === 'object'){
-				job.x=par.x;
-				job.y=par.y;
-			}
+            if (typeof par === 'number') {
+                job.mines = par;
+            }
+            else if (typeof par === 'object'){
+                job.x = par.x;
+                job.y = par.y;
+            }
             msObj.worker.postMessage(JSON.stringify(job));
-		};
+        };
 
         this.initWorkers = function (wPath) {
             if (window.Worker) {
                 // Create a background web worker to process the grid "painting" with a stack
                 msObj.worker = new Worker(wPath);
-                msObj.worker.onmessage= function (e) {
+                msObj.worker.onmessage = function (e) {
                     var data = JSON.parse(e.data);
                     msObj.handleWorkerMessage(data);
                 };
@@ -133,23 +133,23 @@ jQuery(function ($) {
             });
 
             msUI.on('mousedown', function (ev) {
-                if (ev.which === RIGHT_MB) {
+                if (ev.which === RIGHT_MOUSE_BUTTON) {
                     clearTimeout(msObj.RIGHT_BUTTON_TIMEOUT);
                     msObj.RIGHT_MOUSE_DOWN = true;
                 }
-                else if (ev.which === LEFT_MB) {
+                else if (ev.which === LEFT_MOUSE_BUTTON) {
                     clearTimeout(msObj.LEFT_BUTTON_TIMEOUT);
                     msObj.LEFT_MOUSE_DOWN = true;
                 }
             });
 
             msUI.on('mouseup', function (ev) {
-                if (ev.which === RIGHT_MB) {
+                if (ev.which === RIGHT_MOUSE_BUTTON) {
                     msObj.RIGHT_BUTTON_TIMEOUT = setTimeout(function () {
                         msObj.RIGHT_MOUSE_DOWN = false;
                     }, 50);
-				}
-                else if (ev.which === LEFT_MB) {
+                }
+                else if (ev.which === LEFT_MOUSE_BUTTON) {
                     msObj.LEFT_BUTTON_TIMEOUT = setTimeout(function () {
                         msObj.LEFT_MOUSE_DOWN = false;
                     }, 50);
@@ -158,28 +158,30 @@ jQuery(function ($) {
 
             msUI.on('mousedown','.cell', function (ev) {
                 var targ = $(ev.target);
-                if ((ev.which === LEFT_MB&&msObj.RIGHT_MOUSE_DOWN)||
-					(ev.which === RIGHT_MB&&msObj.LEFT_MOUSE_DOWN)) {
-						var x = targ.attr('data-x')-1;
-						var ud=targ.parent().prev();
-						for(var i=x;i<x+3;i++)
-							ud.children(".unknown.[data-x="+i+"]").addClass('test');
-						targ.prev('.unknown').addClass('test');
-						targ.next('.unknown').addClass('test');
-						ud=targ.parent().next();
-						for(var i=x;i<x+3;i++)
-							ud.children(".unknown.[data-x="+i+"]").addClass('test');
-				}
+                if ((ev.which === LEFT_MOUSE_BUTTON&&msObj.RIGHT_MOUSE_DOWN)||
+                    (ev.which === RIGHT_MOUSE_BUTTON&&msObj.LEFT_MOUSE_DOWN)) {
+                        var x = targ.attr('data-x')-1;
+                        var ud = targ.parent().prev();
+                        for(var i = x; i < x + 3; i++) {
+                            ud.children(".unknown.[data-x=" + i + "]").addClass('test');
+                        }
+                        targ.prev('.unknown').addClass('test');
+                        targ.next('.unknown').addClass('test');
+                        ud = targ.parent().next();
+                        for(var i = x; i < x + 3; i++) {
+                            ud.children(".unknown.[data-x=" + i + "]").addClass('test');
+                        }
+                }
             });
 
             msUI.on('mouseup','.cell', function (ev) {
                 var targ = $(ev.target);
-                if (ev.which === LEFT_MB) {
+                if (ev.which === LEFT_MOUSE_BUTTON) {
                     msObj.handleLeftClick(targ);
-				}
-				else if (ev.which === RIGHT_MB) {
+                }
+                else if (ev.which === RIGHT_MOUSE_BUTTON) {
                     msObj.handleRightClick(targ);
-				}
+                }
             });
 
             $('.new-game').on("click",function (ev) {
@@ -199,7 +201,7 @@ jQuery(function ($) {
                 } else {
                     $('.game_settings input').prop('disabled', true);
                 }
-				$('.new-game').trigger('click');
+                $('.new-game').trigger('click');
             });
 
             $('#best_times').on("click",function (ev) {
@@ -229,9 +231,9 @@ jQuery(function ($) {
 
             if (obj.state === STATE_NUMBER) {
                 // auto clear neighbor cells
-				if (msObj.LEFT_MOUSE_DOWN) {
-					msObj.callWorker('get_adjacent',obj);
-				}
+                if (msObj.LEFT_MOUSE_DOWN) {
+                    msObj.callWorker('get_adjacent',obj);
+                }
                 return;
             }
 
@@ -240,18 +242,18 @@ jQuery(function ($) {
             }
             if (obj.state === STATE_QUESTION) {
                 obj.state = STATE_UNKNOWN;
-			}
-			else {
-				var flagDisplay = $('#mine_flag_display'),
-					curr = parseInt(flagDisplay.val(), 10);
-				if (obj.state === STATE_UNKNOWN) {
-					obj.state = STATE_FLAGGED;
-					flagDisplay.val(curr - 1);
-				}
-				else if (obj.state === STATE_FLAGGED) {
-					obj.state = STATE_QUESTION;
-					flagDisplay.val(curr + 1);
-				}
+            }
+            else {
+                var flagDisplay = $('#mine_flag_display'),
+                    curr = parseInt(flagDisplay.val(), 10);
+                if (obj.state === STATE_UNKNOWN) {
+                    obj.state = STATE_FLAGGED;
+                    flagDisplay.val(curr - 1);
+                }
+                else if (obj.state === STATE_FLAGGED) {
+                    obj.state = STATE_QUESTION;
+                    flagDisplay.val(curr + 1);
+                }
             }
             msObj.drawCell(cell);
         };
@@ -261,8 +263,8 @@ jQuery(function ($) {
          * @param cell jQuery representation of cell
          */
         this.handleLeftClick = function (cell) {
-            // cell  = jQuery object
-            // obj   = memory state
+            // cell = jQuery object
+            // obj = memory state
             if (!(cell instanceof jQuery)) {
                 throw "Parameter must be jQuery instance";
             }
@@ -280,9 +282,9 @@ jQuery(function ($) {
             }
             if (obj.state === STATE_NUMBER) {
                 // auto clear neighbor cells
-				if (msObj.RIGHT_MOUSE_DOWN) {
-					msObj.callWorker('get_adjacent',obj);
-				}
+                if (msObj.RIGHT_MOUSE_DOWN) {
+                    msObj.callWorker('get_adjacent',obj);
+                }
                 return;
             }
 
@@ -294,7 +296,7 @@ jQuery(function ($) {
 
             if (msObj.worker) {
                 // Asynchronously
-				msObj.callWorker('touch_adjacent',obj);
+                msObj.callWorker('touch_adjacent',obj);
             }
             else {
                 // Synchronously
@@ -308,18 +310,18 @@ jQuery(function ($) {
         };
 
         this.handleWorkerMessage = function (data) {
-			if (data.type === 'touch_adjacent'||data.type === 'get_adjacent') {
+            if (data.type === 'touch_adjacent'||data.type === 'get_adjacent') {
                 msObj.grid = data.grid;
                 msObj.redrawBoard();
             }
-			else if (data.type === 'calc_win') {
+            else if (data.type === 'calc_win') {
                 if (data.win) {
                     msObj.winGame();
                 }
             }
-			else if (data.type === 'explode') {
+            else if (data.type === 'explode') {
                 var cell = msObj.getJqueryObject(data.cell.x,data.cell.y);
-				msObj.gameOver(cell);
+                msObj.gameOver(cell);
             }
             else if (data.type === 'log') {
                 if (console && console.log) {
@@ -467,11 +469,11 @@ jQuery(function ($) {
             // Insert the board cells in DOM
             if (!msObj.board) {
                 $(msObj.options.selector)
-					.html('')
-					.append(msObj.get_template('settings'))
-					.append(msObj.get_template('actions'))
-					.append(msObj.get_template('status'))
-					.append('<div class="board-wrap"></div>');
+                    .html('')
+                    .append(msObj.get_template('settings'))
+                    .append(msObj.get_template('actions'))
+                    .append(msObj.get_template('status'))
+                    .append('<div class="board-wrap"></div>');
                 msObj.board = $('.board-wrap');
                 msObj.board.attr('unselectable', 'on')
                     .css('UserSelect', 'none')
@@ -500,7 +502,7 @@ jQuery(function ($) {
             });
 
             if (msObj.worker) {
-				msObj.callWorker('calc_win',msObj.options.num_mines);
+                msObj.callWorker('calc_win',msObj.options.num_mines);
             }
             else {
                 if (!window.touchAdjacent) {
@@ -519,8 +521,8 @@ jQuery(function ($) {
                 gridobj;
             if (x instanceof jQuery) {
                 cell = x;
-				x = parseInt(cell.attr('data-x'), 10);
-				y = parseInt(cell.attr('data-y'), 10);
+                x = parseInt(cell.attr('data-x'), 10);
+                y = parseInt(cell.attr('data-y'), 10);
             }
             else if (typeof x === 'number' && typeof y === 'number') {
                 cell = getJqueryObject(x,y);
@@ -580,7 +582,7 @@ jQuery(function ($) {
             for (y = 0; y < height; y++) {
                 for (x = 0; x < width; x++) {
                     var obj = msObj.grid[y][x],
-                        cell= msObj.getJqueryObject(x,y);
+                        cell = msObj.getJqueryObject(x,y);
                     if (obj.mine) {
                         cell.removeClass('ui-icon-help')
                             .addClass('ui-icon ui-icon-close blown');
@@ -603,7 +605,7 @@ jQuery(function ($) {
 
         this.checkBestTime = function (time) {
             var level = $('#level').val();
-            if (level !== 'custom') {
+            if (level ! == 'custom') {
                 var best_time = localStorage.getItem('best_time_' + level);
 
                 if (!best_time || parseInt(time, 10) < parseInt(best_time, 10)) {
