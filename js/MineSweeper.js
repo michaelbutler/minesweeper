@@ -605,7 +605,7 @@ jQuery(function ($) {
 
         this.checkBestTime = function (time) {
             var level = $('#level').val();
-            if (level ! == 'custom') {
+            if (level !== 'custom') {
                 var best_time = localStorage.getItem('best_time_' + level);
 
                 if (!best_time || parseInt(time, 10) < parseInt(best_time, 10)) {
