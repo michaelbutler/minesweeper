@@ -1,0 +1,121 @@
+/* minesweeper.css */
+
+html, body {
+   margin: 0;
+   padding: 0;
+}
+
+body {
+   font-size: 1em;
+   font-family: Arial, Helvetica, sans-serif;
+   padding: 1em;
+}
+
+.hide {
+   display: none;
+}
+
+.invisible {
+   visibility: hidden;
+}
+
+.ajax-loading {
+   display: inline-block;
+   padding-left: 1em;
+}
+
+h1 {
+   margin: 0 0 0.3em 0;
+}
+
+.gh { float: right; }
+
+.board-wrap {
+   -moz-user-select: none;
+   -khtml-user-select: none;
+   -webkit-user-select: none;
+   user-select: none;
+   cursor: default;
+}
+
+.board-wrap .row {
+   padding: 0;
+   margin: 0;
+   height: 24px;
+}
+
+.board-wrap .row .cell {
+   list-style: none;
+   padding: 0;
+   margin: 0;
+   display: inline-block;
+   width: 18px;
+   height: 18px;
+   border: 3px outset #aaa;
+   background-color: #c9c9c9;
+   vertical-align: middle;
+   text-align: center;
+   line-height: 19px;
+   font-weight: bold;
+}
+
+.board-wrap .row li:hover {
+   background-color: #dee6ed;
+}
+
+.board-wrap .row .cell.open {
+}
+
+.board-wrap .row .cell.number,
+.board-wrap .row .cell.open {
+   border: 1px solid grey;
+   padding: 2px;
+}
+
+.board-wrap .row .cell.number {
+   background-color: rgb(213, 187, 191);
+}
+
+.board-wrap .row .cell.flagged {
+   background-color: red;
+   background-color: rgba(255, 61, 61, 0.82);
+}
+
+.board-wrap .row .cell.question {
+   background-color: lightblue;
+}
+
+.board-wrap .row .cell.explode {
+   color: red;
+   background-color: white;
+}
+
+.board-wrap .cell.unknown:active {
+   border-style: inset;
+}
+
+.board-wrap .cell.test{
+   border-style: inset;
+}
+
+.cell.blown {
+   opacity: 1.0;
+}
+
+.cell.unblown {
+   opacity: 0.5;
+}
+
+.cell[data-number="1"] {
+   color: blue;
+}
+.cell[data-number="2"] {
+   color: darkgreen;
+}
+.cell[data-number="3"] {
+   color: red;
+}
+
+.game_settings, .game_actions, .game_status {
+   margin: 10px 0;
+}
