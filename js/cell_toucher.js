@@ -19,74 +19,37 @@
  along with Minesweeper.js.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var self = this;
 
-function postDebug(obj) {
-    var data = {
-        'type': 'log',
-        'obj': obj
-    };
-    if (self && self.postMessage) {
-        self.postMessage(JSON.stringify(data));
-    }
-}
 
 /**
  * @param obj
  * @param grid
  * @returns {Array}
  */
-function get8AdjacentSquares(obj, grid) {
-    var array = [],
-        x = obj.x,
-        y = obj.y;
+function getAdjacentSquares(obj, grid) {
+        var cell,
+            x = obj.x,
+            y = obj.y,
+            mY = grid.length - 1,
+            mX = grid[0].length - 1;
 
     //  0  1  2
     //  3  .  4
     //  5  6  7
-
-    try {
-        array[0] = grid[y - 1][x - 1];
-    } catch (e) {
-    }
-    try {
-        array[1] = grid[y - 1][x];
-    } catch (e) {
-    }
-    try {
-        array[2] = grid[y - 1][x + 1];
-    } catch (e) {
-    }
-    try {
-        array[3] = grid[y][x - 1];
-    } catch (e) {
-    }
-    try {
-        array[4] = grid[y][x + 1];
-    } catch (e) {
-    }
-    try {
-        array[5] = grid[y + 1][x - 1];
-    } catch (e) {
-    }
-    try {
-        array[6] = grid[y + 1][x];
-    } catch (e) {
-    }
-    try {
-        array[7] = grid[y + 1][x + 1];
-    } catch (e) {
-    }
-
     var results = [];
-    for (var i = 0; i < 8; i++) {
-        if (array[i]) {
-            results.push(array[i]);
+
+    for (var i = Math.max(0,y-1); i <= Math.min(mY,y+1); i++) {
+        for (var j =  Math.max(0,x-1); j <= Math.min(mX,x+1); j++) {
+            if (i != y || j != x) {
+                cell = grid[i][j];
+                if (cell) results.push(cell);
+            }
         }
     }
 
     return results;
 }
+
 
 
 
@@ -98,76 +61,49 @@ function get8AdjacentSquares(obj, grid) {
  * @param grid
  * @returns {*}
  */
-function touchAdjacent(obj, grid) {
-    var squares = null, //self.get8AdjacentSquares(obj),
-        x,
-        max,
-        num_mines = 0,
-        stack = [],
-        n = null,
-        sq;
+function touchAdjacent(cell, grid) {
+    var stack = [];
 
-    stack.push(obj);
-
-    if (obj.mine) {
-        // console.log(obj);
-        throw "error: 'touched' a mine automatically";
-    }
+    stack.push(cell);
 
     while (stack.length > 0) {
-        num_mines = 0;
-        n = stack.pop();
+        var squares, 
+            num_mines = 0,
+            curCell = stack.pop();
 
-        squares = get8AdjacentSquares(n, grid);
+        squares = getAdjacentSquares(curCell, grid);
 
         // calc # of mines
-        for (x = 0, max = squares.length; x < max; x++) {
-            sq = squares[x];
+        for (var i = 0; i < squares.length; i++) {
+            var sq = squares[i];
             if (sq.mine) {
-                num_mines++;
+                num_mines += 1;
             }
         }
-
+        curCell.number = num_mines;
         if (num_mines > 0) {
-            n.state = 'number';
-            n.number = num_mines;
+            curCell.state = 'number';
         }
         else {
-            n.state = 'open';
-            n.number = 0;
-        }
-
-        for (x = 0, max = squares.length; x < max; x++) {
-            sq = squares[x];
-            if (sq.state === 'open' || sq.state === 'number') {
-                // ignore because already processed
-            }
-            else if (!sq.mine && num_mines === 0) {
-                stack.push(sq);
+            curCell.state = 'open';
+            for (var i = 0; i < squares.length; i++) {
+                var sq = squares[i];
+                if (sq.state !== 'open' && sq.state !== 'number') {
+                    stack.push(sq);
+                }
             }
         }
     }
-
-    return grid;
 }
 
-function minesweeperCalculateWin(grid) {
-    var win = false,
-        mines = 0,
-        closed_cells = 0,
-        y,
-        x,
-        max,
-        max2,
-        obj;
+function minesweeperCalculateWin(grid,mines) {
+    var closed_cells = 0,
+        cell;
 
-    for (y = 0, max = grid.length; y < max; y++) {
-        for (x = 0, max2 = grid[0].length; x < max2; x++) {
-            obj = grid[y][x];
-            if (obj.mine) {
-                mines += 1;
-            }
-            if (!(obj.state === 'open' || obj.state === 'number')) {
+    for (var y = 0; y < grid.length; y++) {
+        for (var x = 0; x < grid[0].length; x++) {
+            cell = grid[y][x];
+            if (!(cell.state === 'open' || cell.state === 'number')) {
                 closed_cells += 1;
             }
         }
@@ -176,51 +112,47 @@ function minesweeperCalculateWin(grid) {
     return (mines === closed_cells);
 }
 
-if (self.document === undefined) {
-    self.addEventListener('message', function (e) {
-        var data = e.data,
-            resp = {},
-            cell = {},
-            grid = {},
-            squares;
-        data = JSON.parse(data);
-        grid = data.grid;
-
-        if (data.type === 'touch_adjacent') {
-            cell = grid[data.y][data.x];
+if (this.document === undefined) {
+    onmessage = function (p){
+        var data = JSON.parse(p.data),
+            grid = data.grid,
+            resp = {};
+        resp.type = data.type;
+        if (data.type === 'calc_win') {
+            resp.win = minesweeperCalculateWin(grid,data.mines);
+        }
+        else {
+            var cell = grid[data.y][data.x];
+            if (data.type === 'touch_adjacent') {
             // This takes 1-2 seconds
-            grid = touchAdjacent(cell, grid);
             // After work is finished pass the grid state back to main
-            resp = {
-                'type': data.type,
-                'grid': grid
-            };
-        }
-        else if (data.type === 'calc_win') {
-            resp = {
-                'type': data.type,
-                'win': minesweeperCalculateWin(grid)
-            };
-        }
-        else if (data.type === 'get_adjacent') {
-            cell = grid[data.y][data.x];
-            squares = get8AdjacentSquares(cell, grid);
-            try {
-                for (var i = 0, max = squares.length; i < max; i++) {
-                    grid = touchAdjacent(squares[i], grid);
+                touchAdjacent(cell, grid);
+            }
+            else if (data.type === 'get_adjacent') {
+                var squares = getAdjacentSquares(cell, grid);
+                var nrFlag = 0;
+                for (var i = 0 ; i < squares.length; i++) {
+                    var sq = squares[i];
+                    if (sq.state == 'flagged') nrFlag++;
                 }
-                resp = {
-                    'type': 'touch_adjacent',
-                    'grid': grid
+                if (nrFlag == cell.number) {
+                    for (var i = 0 ; i < squares.length; i++) {
+                        var sq = squares[i];
+                        if (sq.mine) {
+                            if(sq.state != 'flagged') {
+                                resp.type = 'explode';
+                                resp.cell = sq;
+                                break;
+                            }
+                        }
+                        else {
+                            touchAdjacent(sq, grid);
+                        }
+                    }
                 }
             }
-            catch (e) {
-                resp = {
-                    'type': 'explode',
-                    'grid': grid
-                }
-            }
+            resp.grid = grid;
         }
-        self.postMessage(JSON.stringify(resp));
-    }, false);
+        postMessage(JSON.stringify(resp));
+    }
 }
