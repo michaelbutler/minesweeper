@@ -57,7 +57,7 @@ function getAdjacentSquares(obj, grid) {
  * Touch all adjacent squares (there are 8)
  * Setting to either a number OR open state
  * If adjacent square results in OPEN state: TOUCH it also
- * @param obj
+ * @param cell
  * @param grid
  * @returns {*}
  */
@@ -67,15 +67,17 @@ function touchAdjacent(cell, grid) {
     stack.push(cell);
 
     while (stack.length > 0) {
-        var squares, 
+        var squares,
             num_mines = 0,
-            curCell = stack.pop();
+            curCell = stack.pop(),
+            i,
+            sq;
 
         squares = getAdjacentSquares(curCell, grid);
 
         // calc # of mines
-        for (var i = 0; i < squares.length; i++) {
-            var sq = squares[i];
+        for (i = 0; i < squares.length; i++) {
+            sq = squares[i];
             if (sq.mine) {
                 num_mines += 1;
             }
@@ -86,8 +88,8 @@ function touchAdjacent(cell, grid) {
         }
         else {
             curCell.state = 'open';
-            for (var i = 0; i < squares.length; i++) {
-                var sq = squares[i];
+            for (i = 0; i < squares.length; i++) {
+                sq = squares[i];
                 if (sq.state !== 'open' && sq.state !== 'number') {
                     stack.push(sq);
                 }

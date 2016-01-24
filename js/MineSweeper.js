@@ -68,8 +68,6 @@ jQuery(function ($) {
             num_mines: levels.beginner.num_mines,
             path_to_cell_toucher: 'js/cell_toucher.js'
         };
-        this.LEFT_MOUSE_CLICKED = false;
-        this.RIGHT_MOUSE_CLICKED = false;
 
         this.init = function (options) {
             msObj.options = $.extend({}, msObj.defaults, options || {});
@@ -94,18 +92,22 @@ jQuery(function ($) {
             return msObj;
         };
 
-        this.callWorker = function(task,par) {
+        /**
+         *
+         * @param taskType get_adjacent, touch_adjacent, or calc_win
+         * @param payload number or object with {x: ?, y: ?}
+         */
+        this.callWorker = function(taskType, payload) {
             $('.ajax-loading').removeClass('invisible');
             var job = {
-                type: task, // message type
+                type: taskType, // message type
                 grid: msObj.grid
             };
-            if (typeof par === 'number') {
-                job.mines = par;
-            }
-            else if (typeof par === 'object'){
-                job.x = par.x;
-                job.y = par.y;
+            if (typeof payload === 'number') {
+                job.mines = payload;
+            } else if (typeof payload === 'object'){
+                job.x = payload.x;
+                job.y = payload.y;
             }
             msObj.worker.postMessage(JSON.stringify(job));
         };
@@ -118,11 +120,8 @@ jQuery(function ($) {
                     var data = JSON.parse(e.data);
                     msObj.handleWorkerMessage(data);
                 };
-            }
-            else {
-                msObj.worker = null;
-                // for older browsers, load the web worker script in global space to access the functions
-                $.getScript(wPath);
+            } else {
+                alert("Minesweeper requires Web Worker support. See https://browser-update.org/update.html");
             }
         };
 
@@ -136,8 +135,7 @@ jQuery(function ($) {
                 if (ev.which === RIGHT_MOUSE_BUTTON) {
                     clearTimeout(msObj.RIGHT_BUTTON_TIMEOUT);
                     msObj.RIGHT_MOUSE_DOWN = true;
-                }
-                else if (ev.which === LEFT_MOUSE_BUTTON) {
+                } else if (ev.which === LEFT_MOUSE_BUTTON) {
                     clearTimeout(msObj.LEFT_BUTTON_TIMEOUT);
                     msObj.LEFT_MOUSE_DOWN = true;
                 }
@@ -148,8 +146,7 @@ jQuery(function ($) {
                     msObj.RIGHT_BUTTON_TIMEOUT = setTimeout(function () {
                         msObj.RIGHT_MOUSE_DOWN = false;
                     }, 50);
-                }
-                else if (ev.which === LEFT_MOUSE_BUTTON) {
+                } else if (ev.which === LEFT_MOUSE_BUTTON) {
                     msObj.LEFT_BUTTON_TIMEOUT = setTimeout(function () {
                         msObj.LEFT_MOUSE_DOWN = false;
                     }, 50);
@@ -158,19 +155,22 @@ jQuery(function ($) {
 
             msUI.on('mousedown','.cell', function (ev) {
                 var targ = $(ev.target);
-                if ((ev.which === LEFT_MOUSE_BUTTON&&msObj.RIGHT_MOUSE_DOWN)||
-                    (ev.which === RIGHT_MOUSE_BUTTON&&msObj.LEFT_MOUSE_DOWN)) {
-                        var x = targ.attr('data-x')-1;
-                        var ud = targ.parent().prev();
-                        for(var i = x; i < x + 3; i++) {
-                            ud.children(".unknown.[data-x=" + i + "]").addClass('test');
-                        }
-                        targ.prev('.unknown').addClass('test');
-                        targ.next('.unknown').addClass('test');
-                        ud = targ.parent().next();
-                        for(var i = x; i < x + 3; i++) {
-                            ud.children(".unknown.[data-x=" + i + "]").addClass('test');
-                        }
+                if ((ev.which === LEFT_MOUSE_BUTTON && msObj.RIGHT_MOUSE_DOWN) ||
+                    (ev.which === RIGHT_MOUSE_BUTTON && msObj.LEFT_MOUSE_DOWN)
+                ) {
+                    var x = targ.attr('data-x') - 1;
+                    var ud = targ.parent().prev();
+                    var i;
+
+                    for(i = x; i < x + 3; i++) {
+                        ud.children(".unknown.[data-x=" + i + "]").addClass('test');
+                    }
+                    targ.prev('.unknown').addClass('test');
+                    targ.next('.unknown').addClass('test');
+                    ud = targ.parent().next();
+                    for(i = x; i < x + 3; i++) {
+                        ud.children(".unknown.[data-x=" + i + "]").addClass('test');
+                    }
                 }
             });
 
@@ -178,13 +178,12 @@ jQuery(function ($) {
                 var targ = $(ev.target);
                 if (ev.which === LEFT_MOUSE_BUTTON) {
                     msObj.handleLeftClick(targ);
-                }
-                else if (ev.which === RIGHT_MOUSE_BUTTON) {
+                } else if (ev.which === RIGHT_MOUSE_BUTTON) {
                     msObj.handleRightClick(targ);
                 }
             });
 
-            $('.new-game').on("click",function (ev) {
+            $('.new-game').on("click", function (ev) {
                 ev.preventDefault();
                 msObj.stopTimer();
                 msObj.timer = '';
@@ -195,23 +194,26 @@ jQuery(function ($) {
                 msObj.resetDisplays();
             });
 
-            $('#level').on("change",function (ev) {
+            $('#level').on("change",function () {
+                var input = $('.game_settings input');
                 if ($('#level option:selected').val() === 'custom') {
-                    $('.game_settings input').prop('disabled', false);
+                    input.prop('disabled', false);
                 } else {
-                    $('.game_settings input').prop('disabled', true);
+                    input.prop('disabled', true);
                 }
                 $('.new-game').trigger('click');
             });
 
-            $('#best_times').on("click",function (ev) {
-                var beginner_time = localStorage.getItem('best_time_beginner') || '***';
-                var intermediate_time = localStorage.getItem('best_time_intermediate') || '***';
-                var expert_time = localStorage.getItem('best_time_expert') || '***';
-                var beginner_name = localStorage.getItem('beginner_record_holder') || '***';
-                var intermediate_name = localStorage.getItem('intermediate_record_holder') || '***';
-                var expert_name = localStorage.getItem('expert_record_holder') || '***';
-                alert("Best times:\nBeginner:\t" + beginner_name + "\t" + beginner_time + "\nIntermediate:\t" + intermediate_name + "\t" + intermediate_time + "\nExpert:\t" + expert_name + "\t" + expert_time);
+            $('#best_times').on("click", function (ev) {
+                var beginner_time = localStorage.getItem('best_time_beginner') || 'None';
+                var intermediate_time = localStorage.getItem('best_time_intermediate') || 'None';
+                var expert_time = localStorage.getItem('best_time_expert') || 'None';
+                var beginner_name = localStorage.getItem('beginner_record_holder') || 'None';
+                var intermediate_name = localStorage.getItem('intermediate_record_holder') || 'None';
+                var expert_name = localStorage.getItem('expert_record_holder') || 'None';
+                alert("Best times:\nBeginner:\t" + beginner_name + "\t" + beginner_time + "\n" +
+                    "Intermediate:\t" + intermediate_name + "\t" + intermediate_time + "\n" +
+                    "Expert:\t" + expert_name + "\t" + expert_time);
             });
 
         };
@@ -232,7 +234,7 @@ jQuery(function ($) {
             if (obj.state === STATE_NUMBER) {
                 // auto clear neighbor cells
                 if (msObj.LEFT_MOUSE_DOWN) {
-                    msObj.callWorker('get_adjacent',obj);
+                    msObj.callWorker('get_adjacent', obj);
                 }
                 return;
             }
@@ -242,15 +244,13 @@ jQuery(function ($) {
             }
             if (obj.state === STATE_QUESTION) {
                 obj.state = STATE_UNKNOWN;
-            }
-            else {
+            } else {
                 var flagDisplay = $('#mine_flag_display'),
                     curr = parseInt(flagDisplay.val(), 10);
                 if (obj.state === STATE_UNKNOWN) {
                     obj.state = STATE_FLAGGED;
                     flagDisplay.val(curr - 1);
-                }
-                else if (obj.state === STATE_FLAGGED) {
+                } else if (obj.state === STATE_FLAGGED) {
                     obj.state = STATE_QUESTION;
                     flagDisplay.val(curr + 1);
                 }
@@ -297,8 +297,7 @@ jQuery(function ($) {
             if (msObj.worker) {
                 // Asynchronously
                 msObj.callWorker('touch_adjacent',obj);
-            }
-            else {
+            } else {
                 // Synchronously
                 if (!window.touchAdjacent) {
                     throw ("Could not load " + msObj.options.path_to_cell_toucher);
@@ -310,20 +309,17 @@ jQuery(function ($) {
         };
 
         this.handleWorkerMessage = function (data) {
-            if (data.type === 'touch_adjacent'||data.type === 'get_adjacent') {
+            if (data.type === 'touch_adjacent' || data.type === 'get_adjacent') {
                 msObj.grid = data.grid;
                 msObj.redrawBoard();
-            }
-            else if (data.type === 'calc_win') {
+            } else if (data.type === 'calc_win') {
                 if (data.win) {
                     msObj.winGame();
                 }
-            }
-            else if (data.type === 'explode') {
-                var cell = msObj.getJqueryObject(data.cell.x,data.cell.y);
+            } else if (data.type === 'explode') {
+                var cell = msObj.getJqueryObject(data.cell.x, data.cell.y);
                 msObj.gameOver(cell);
-            }
-            else if (data.type === 'log') {
+            } else if (data.type === 'log') {
                 if (console && console.log) {
                     console.log(data.obj);
                 }
@@ -340,8 +336,7 @@ jQuery(function ($) {
                 x = parseInt(dom_obj.attr('data-x'), 10);
                 y = parseInt(dom_obj.attr('data-y'), 10);
                 gridobj = msObj.grid[y][x];
-            }
-            catch (e) {
+            } catch (e) {
                 console.warn("Could not find memory representation for:");
                 console.log(dom_obj);
                 throw "Stopped.";
@@ -350,7 +345,7 @@ jQuery(function ($) {
             return gridobj;
         };
 
-        this.getJqueryObject = function (x,y) {
+        this.getJqueryObject = function (x, y) {
             return msObj.board.find('.cell[data-coord="' + [x, y].join(',') + '"]');
         };
 
@@ -367,8 +362,7 @@ jQuery(function ($) {
             for (x = 0, max = width * height; x < max; x++) {
                 if (x < total_mines) {
                     array[x] = 1;
-                }
-                else {
+                } else {
                     array[x] = 0;
                 }
             }
@@ -478,8 +472,7 @@ jQuery(function ($) {
                 msObj.board.attr('unselectable', 'on')
                     .css('UserSelect', 'none')
                     .css('MozUserSelect', 'none');
-            }
-            else {
+            } else {
                 msObj.board.html('');
             }
             for (y = 0; y < height; y++) {
@@ -503,8 +496,7 @@ jQuery(function ($) {
 
             if (msObj.worker) {
                 msObj.callWorker('calc_win',msObj.options.num_mines);
-            }
-            else {
+            } else {
                 if (!window.touchAdjacent) {
                     throw ("Could not load " + msObj.options.path_to_cell_toucher);
                 }
@@ -523,17 +515,15 @@ jQuery(function ($) {
                 cell = x;
                 x = parseInt(cell.attr('data-x'), 10);
                 y = parseInt(cell.attr('data-y'), 10);
-            }
-            else if (typeof x === 'number' && typeof y === 'number') {
-                cell = getJqueryObject(x,y);
+            } else if (typeof x === 'number' && typeof y === 'number') {
+                cell = msObj.getJqueryObject(x, y);
             }
 
             cell.removeClass().addClass('cell');
 
             try {
                 gridobj = msObj.grid[y][x];
-            }
-            catch (e) {
+            } catch (e) {
                 console.warn("Invalid grid coord: x,y = " + [x, y].join(','));
                 return;
             }
@@ -546,6 +536,7 @@ jQuery(function ($) {
                     break;
                 case STATE_QUESTION:
                     cell.addClass('ui-icon ui-icon-help');
+                    // Break purposely left out
                 case STATE_UNKNOWN:
                 case STATE_OPEN:
                 case STATE_EXPLODE:
@@ -586,8 +577,7 @@ jQuery(function ($) {
                     if (obj.mine) {
                         cell.removeClass('ui-icon-help')
                             .addClass('ui-icon ui-icon-close blown');
-                    }
-                    else {
+                    } else {
                         cell.addClass('unblown');
                     }
                 }
@@ -609,7 +599,7 @@ jQuery(function ($) {
                 var best_time = localStorage.getItem('best_time_' + level);
 
                 if (!best_time || parseInt(time, 10) < parseInt(best_time, 10)) {
-                    var display_name = localStorage.getItem(level + '_record_holder')
+                    var display_name = localStorage.getItem(level + '_record_holder');
                     if (!display_name) {
                         display_name = 'Your name';
                     }
