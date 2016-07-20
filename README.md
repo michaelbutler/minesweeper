@@ -8,9 +8,8 @@ Demo: http://michaelbutler.github.io/minesweeper/
 
 Features:
 -----------
-+ Configurable grid size (X, Y)
 + User can choose difficulty level
-+ Configurable number of mines
++ Custom option with configurable grid size (X, Y) and number of mines
 + Stopwatch with score keeping (LocalStorage)
 + Stack based grid traversal algorithm for memory efficiency
 + HTML5 web worker (if supported) will be used to perform the stack algorithm outside of the UI thread
@@ -38,10 +37,8 @@ Example HTML usage:
 
 To Do:
 -----------
-+ Auto-clear feature to clear multiple squares at once
 + Add animation and better graphics
 + Enhance UI for a sleek new look
-
 
 License:
 -----------
