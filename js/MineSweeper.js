@@ -385,7 +385,7 @@ jQuery(function ($) {
                 }
             }
 
-            fisherYates(array);
+            do {fisherYates(array)} while(array[0]==1)
 
             return array;
         };
