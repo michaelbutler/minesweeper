@@ -1,0 +1,7 @@
+{
+  "name": "minesweeper",
+  "author": "Michael Butler <michael@butlerpc.net>",
+  "scripts": {
+      "test": "grunt travis -v"
+  }
+}
