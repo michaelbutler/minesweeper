@@ -1,5 +1,7 @@
 Minesweeper.js
 ===========
+![master build status](https://travis-ci.org/michaelbutler/minesweeper.svg?branch=master "master build status")
+
 By Michael Butler
 
 A WebWorker powered Minesweeper game written in JavaScript, HTML and CSS. 
