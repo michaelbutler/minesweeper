@@ -410,11 +410,11 @@ jQuery(function ($) {
                 var num_mines = parseInt($('#num_mines').val(), 10);
 
                 // rationalise options JIC
-                if (dim_x == 'NaN' || dim_x == 0) dim_x = 1;
+                if (isNaN(dim_x) || (dim_x == 0)) dim_x = 1;
                 if (dim_x > MAX_X) dim_x = MAX_X;
-                if (dim_y == 'NaN' || dim_y == 0) dim_y = 1;
+                if (isNaN(dim_y) || (dim_y == 0)) dim_y = 1;
                 if (dim_y > MAX_Y) dim_y = MAX_Y;
-                if (num_mines == 'NaN' || num_mines == 0) num_mines = 1;
+                if (isNaN(num_mines) || (num_mines == 0)) num_mines = 1;
                 if (num_mines >= (dim_x * dim_y)) num_mines=(dim_x * dim_y)-1;
                 // refresh display with updated values
                 $('#dim_x').val(dim_x);
