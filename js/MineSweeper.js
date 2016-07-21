@@ -179,16 +179,15 @@ jQuery(function ($) {
             msUI.on('mouseup','.cell', function (ev) {
                 var targ = $(ev.target);
                 if (ev.which === LEFT_MOUSE_BUTTON) {
-                    if (ev.shiftKey || ev.ctrlKey) 
-                    {
-                      setTimeout(function () {
-                        msObj.MODIFIER_KEY_DOWN = false;
-                      }, 50);
-                      msObj.MODIFIER_KEY_DOWN = true;
-                      msObj.handleRightClick(targ);
+                    if (ev.shiftKey || ev.ctrlKey) {
+	                    msObj.MODIFIER_KEY_DOWN = true;
+	                    setTimeout(function () {
+	                      msObj.MODIFIER_KEY_DOWN = false;
+	                    }, 50);
+	                    msObj.handleRightClick(targ);
+                    } else {
+                        msObj.handleLeftClick(targ);
                     }
-                    else 
-                      msObj.handleLeftClick(targ);
                 } else if (ev.which === RIGHT_MOUSE_BUTTON) {
                     msObj.handleRightClick(targ);
                 }
@@ -394,7 +393,9 @@ jQuery(function ($) {
                 }
             }
 
-            do {fisherYates(array)} while(array[0]==1)
+            do {
+            	fisherYates(array);
+            } while(array[0] == 1)
 
             return array;
         };
@@ -409,10 +410,11 @@ jQuery(function ($) {
                 var num_mines = parseInt($('#num_mines').val(), 10);
 
                 // rationalise options JIC
-                if (dim_x == 0) dim_x = 1;
+                if (dim_x == 'NaN' || dim_x == 0) dim_x = 1;
                 if (dim_x > MAX_X) dim_x = MAX_X;
-                if (dim_y == 0) dim_y = 1;
+                if (dim_y == 'NaN' || dim_y == 0) dim_y = 1;
                 if (dim_y > MAX_Y) dim_y = MAX_Y;
+                if (num_mines == 'NaN' || num_mines == 0) num_mines = 1;
                 if (num_mines >= (dim_x * dim_y)) num_mines=(dim_x * dim_y)-1;
                 // refresh display with updated values
                 $('#dim_x').val(dim_x);
