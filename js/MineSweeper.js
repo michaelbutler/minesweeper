@@ -179,7 +179,16 @@ jQuery(function ($) {
             msUI.on('mouseup','.cell', function (ev) {
                 var targ = $(ev.target);
                 if (ev.which === LEFT_MOUSE_BUTTON) {
-                    msObj.handleLeftClick(targ);
+                    if (ev.shiftKey || ev.ctrlKey) 
+                    {
+                      setTimeout(function () {
+                        msObj.MODIFIER_KEY_DOWN = false;
+                      }, 50);
+                      msObj.MODIFIER_KEY_DOWN = true;
+                      msObj.handleRightClick(targ);
+                    }
+                    else 
+                      msObj.handleLeftClick(targ);
                 } else if (ev.which === RIGHT_MOUSE_BUTTON) {
                     msObj.handleRightClick(targ);
                 }
@@ -235,7 +244,7 @@ jQuery(function ($) {
 
             if (obj.state === STATE_NUMBER) {
                 // auto clear neighbor cells
-                if (msObj.LEFT_MOUSE_DOWN) {
+                if (msObj.LEFT_MOUSE_DOWN || msObj.MODIFIER_KEY_DOWN) {
                     msObj.callWorker('get_adjacent', obj);
                 }
                 return;
