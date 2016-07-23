@@ -1,6 +1,6 @@
 Minesweeper.js
 ===========
-![master build status](https://travis-ci.org/michaelbutler/minesweeper.svg?branch=master "master build status")
+[![Build Status](https://travis-ci.org/michaelbutler/minesweeper.svg?branch=master)](https://travis-ci.org/michaelbutler/minesweeper)
 
 By Michael Butler
 
