@@ -47,7 +47,7 @@ To Do:
 
 Contributing:
 -----------
-See CONTRIBUTE.md for how to contribute.
+See [CONTRIBUTE.md](https://github.com/michaelbutler/minesweeper/blob/master/CONTRIBUTE.md) for how to contribute.
 
 
 License:
