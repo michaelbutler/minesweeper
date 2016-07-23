@@ -45,6 +45,11 @@ To Do:
 + Enhance UI for a sleek new look
 
 
+Contributing:
+-----------
+See CONTRIBUTE.md for how to contribute.
+
+
 License:
 -----------
     Minesweeper.js is free software: you can redistribute it and/or modify
