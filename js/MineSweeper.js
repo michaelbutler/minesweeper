@@ -184,11 +184,11 @@ jQuery(function ($) {
                 var targ = $(ev.target);
                 if (ev.which === LEFT_MOUSE_BUTTON) {
                     if (ev.shiftKey || ev.ctrlKey) {
-	                    msObj.MODIFIER_KEY_DOWN = true;
-	                    setTimeout(function () {
-	                      msObj.MODIFIER_KEY_DOWN = false;
-	                    }, 50);
-	                    msObj.handleRightClick(targ);
+                      msObj.MODIFIER_KEY_DOWN = true;
+                      setTimeout(function () {
+                        msObj.MODIFIER_KEY_DOWN = false;
+                      }, 50);
+                      msObj.handleRightClick(targ);
                     } else {
                         msObj.handleLeftClick(targ);
                     }
@@ -398,8 +398,8 @@ jQuery(function ($) {
             }
 
             do {
-            	fisherYates(array);
-            } while(array[0] == 1)
+              fisherYates(array);
+            } while(array[0] === 1);
 
             return array;
         };
@@ -414,19 +414,19 @@ jQuery(function ($) {
                 var numMines = parseInt($('#numMines').val(), 10);
 
                 // rationalise options JIC
-                if (isNaN(dimX) || (dimX == 0)) {
+                if (isNaN(dimX) || (dimX === 0)) {
                   dimX = 1;
                 }
                 if (dimX > MAX_X) {
                   dimX = MAX_X;
                 }
-                if (isNaN(dimY) || (dimY == 0)) {
+                if (isNaN(dimY) || (dimY === 0)) {
                   dimY = 1;
                 }
                 if (dimY > MAX_Y) {
                   dimY = MAX_Y;
                 }
-                if (isNaN(numMines) || (numMines == 0)) {
+                if (isNaN(numMines) || (numMines === 0)) {
                   numMines = 1;
                 }
                 if (numMines >= (dimX * dimY)) {
