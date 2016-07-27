@@ -1,5 +1,7 @@
 Minesweeper.js
 ===========
+[![Build Status](https://travis-ci.org/michaelbutler/minesweeper.svg?branch=master)](https://travis-ci.org/michaelbutler/minesweeper)
+
 By Michael Butler
 
 A WebWorker powered Minesweeper game written in JavaScript, HTML and CSS. 
@@ -39,6 +41,13 @@ To Do:
 -----------
 + Add animation and better graphics
 + Enhance UI for a sleek new look
+
+=======
+
+Contributing:
+-----------
+See [CONTRIBUTE.md](https://github.com/michaelbutler/minesweeper/blob/master/CONTRIBUTE.md) for how to contribute.
+
 
 License:
 -----------

@@ -1,3 +1,4 @@
+/* globals alert */
 /**
  MineSweeper.js
  Author: Michael C. Butler
@@ -30,16 +31,16 @@ jQuery(function ($) {
     // standard level configurations
     var levels = {
         'beginner': {
-            'board_size': [9, 9],
-            'num_mines': 10
+            'boardSize': [9, 9],
+            'numMines': 10
         },
         'intermediate': {
-            'board_size': [16, 16],
-            'num_mines': 40
+            'boardSize': [16, 16],
+            'numMines': 40
         },
         'expert': {
-            'board_size': [30, 16],
-            'num_mines': 99
+            'boardSize': [30, 16],
+            'numMines': 99
         }
     };
 
@@ -58,7 +59,7 @@ jQuery(function ($) {
     MineSweeper = function () {
         // prevent namespace pollution
         if (!(this instanceof MineSweeper)) {
-            throw "Invalid use of Minesweeper";
+            throw 'Invalid use of Minesweeper';
         }
         var msObj = this;
         this.options = {};
@@ -66,19 +67,19 @@ jQuery(function ($) {
         this.running = true;
         this.defaults = {
             selector: '#minesweeper',
-            board_size: levels.beginner.board_size,
-            num_mines: levels.beginner.num_mines,
-            path_to_cell_toucher: 'js/cell_toucher.js'
+            boardSize: levels.beginner.boardSize,
+            numMines: levels.beginner.numMines,
+            pathToCellToucher: 'js/cell_toucher.js'
         };
 
         this.init = function (options) {
             msObj.options = $.extend({}, msObj.defaults, options || {});
             var msUI = $(msObj.options.selector);
             if (!msUI.length) {
-                throw "MineSweeper element not found";
+                throw 'MineSweeper element not found';
             }
             if (!window.JSON) {
-                throw "This application requires a JSON parser.";
+                throw 'This application requires a JSON parser.';
             }
             // insert progress animation before the grid
             if ($('.ajax-loading').length < 1) {
@@ -86,7 +87,7 @@ jQuery(function ($) {
                 '<div class="invisible ajax-loading"></div>'
                 );
             }
-            msObj.initWorkers(msObj.options.path_to_cell_toucher);
+            msObj.initWorkers(msObj.options.pathToCellToucher);
             msObj.clearBoard();
             msObj.redrawBoard();
             msObj.resetDisplays();
@@ -123,13 +124,16 @@ jQuery(function ($) {
                     msObj.handleWorkerMessage(data);
                 };
             } else {
-                alert("Minesweeper requires Web Worker support. See https://browser-update.org/update.html");
+                alert(
+                    'Minesweeper requires Web Worker support. ' +
+                    'See https://browser-update.org/update.html'
+                );
             }
         };
 
         this.initHandlers = function (msUI) {
 
-            msUI.on("contextmenu", ".cell", function (ev) {
+            msUI.on('contextmenu', '.cell', function (ev) {
                 ev.preventDefault();
             });
 
@@ -165,13 +169,13 @@ jQuery(function ($) {
                     var i;
 
                     for(i = x; i < x + 3; i++) {
-                        ud.children(".unknown.[data-x=" + i + "]").addClass('test');
+                        ud.children('.unknown.[data-x=' + i + ']').addClass('test');
                     }
                     targ.prev('.unknown').addClass('test');
                     targ.next('.unknown').addClass('test');
                     ud = targ.parent().next();
                     for(i = x; i < x + 3; i++) {
-                        ud.children(".unknown.[data-x=" + i + "]").addClass('test');
+                        ud.children('.unknown.[data-x=' + i + ']').addClass('test');
                     }
                 }
             });
@@ -193,7 +197,7 @@ jQuery(function ($) {
                 }
             });
 
-            $('.new-game').on("click", function (ev) {
+            $('.new-game').on('click', function (ev) {
                 ev.preventDefault();
                 msObj.stopTimer();
                 msObj.timer = '';
@@ -204,7 +208,7 @@ jQuery(function ($) {
                 msObj.resetDisplays();
             });
 
-            $('#level').on("change",function () {
+            $('#level').on('change', function () {
                 var input = $('.game_settings input');
                 if ($('#level option:selected').val() === 'custom') {
                     input.prop('disabled', false);
@@ -214,16 +218,16 @@ jQuery(function ($) {
                 $('.new-game').trigger('click');
             });
 
-            $('#best_times').on("click", function (ev) {
-                var beginner_time = localStorage.getItem('best_time_beginner') || 'None';
-                var intermediate_time = localStorage.getItem('best_time_intermediate') || 'None';
-                var expert_time = localStorage.getItem('best_time_expert') || 'None';
-                var beginner_name = localStorage.getItem('beginner_record_holder') || 'None';
-                var intermediate_name = localStorage.getItem('intermediate_record_holder') || 'None';
-                var expert_name = localStorage.getItem('expert_record_holder') || 'None';
-                alert("Best times:\nBeginner:\t" + beginner_name + "\t" + beginner_time + "\n" +
-                    "Intermediate:\t" + intermediate_name + "\t" + intermediate_time + "\n" +
-                    "Expert:\t" + expert_name + "\t" + expert_time);
+            $('#best_times').on('click', function () {
+                var beginnerTime = localStorage.getItem('best_time_beginner') || 'None';
+                var intermediateTime = localStorage.getItem('best_time_intermediate') || 'None';
+                var expertTime = localStorage.getItem('best_time_expert') || 'None';
+                var beginnerName = localStorage.getItem('beginner_record_holder') || 'None';
+                var intermediateName = localStorage.getItem('intermediate_record_holder') || 'None';
+                var expertName = localStorage.getItem('expert_record_holder') || 'None';
+                alert('Best times:\nBeginner:\t' + beginnerName + '\t' + beginnerTime + '\n' +
+                    'Intermediate:\t' + intermediateName + '\t' + intermediateTime + '\n' +
+                    'Expert:\t' + expertName + '\t' + expertTime);
             });
 
         };
@@ -234,7 +238,7 @@ jQuery(function ($) {
          */
         this.handleRightClick = function (cell) {
             if (!(cell instanceof jQuery)) {
-                throw "Parameter must be jQuery instance";
+                throw 'Parameter must be jQuery instance';
             }
             if (!msObj.running) {
                 return;
@@ -276,7 +280,7 @@ jQuery(function ($) {
             // cell = jQuery object
             // obj = memory state
             if (!(cell instanceof jQuery)) {
-                throw "Parameter must be jQuery instance";
+                throw 'Parameter must be jQuery instance';
             }
             if (!msObj.running) {
                 return;
@@ -310,9 +314,9 @@ jQuery(function ($) {
             } else {
                 // Synchronously
                 if (!window.touchAdjacent) {
-                    throw ("Could not load " + msObj.options.path_to_cell_toucher);
+                    throw ('Could not load ' + msObj.options.pathToCellToucher);
                 }
-                msObj.grid = touchAdjacent(obj, msObj.grid);
+                msObj.grid = window.touchAdjacent(obj, msObj.grid);
                 // redraw board from memory representation
                 msObj.redrawBoard();
             }
@@ -338,18 +342,18 @@ jQuery(function ($) {
         };
 
         // return memory representation for jQuery instance
-        this.getCellObj = function (dom_obj) {
+        this.getCellObj = function (domObj) {
             var gridobj,
                 x,
                 y;
             try {
-                x = parseInt(dom_obj.attr('data-x'), 10);
-                y = parseInt(dom_obj.attr('data-y'), 10);
+                x = parseInt(domObj.attr('data-x'), 10);
+                y = parseInt(domObj.attr('data-y'), 10);
                 gridobj = msObj.grid[y][x];
             } catch (e) {
-                console.warn("Could not find memory representation for:");
-                console.log(dom_obj);
-                throw "Stopped.";
+                console.warn('Could not find memory representation for:');
+                console.log(domObj);
+                throw 'Stopped.';
             }
 
             return gridobj;
@@ -360,17 +364,17 @@ jQuery(function ($) {
         };
 
         this.getRandomMineArray = function () {
-            var width = msObj.options.board_size[0],
-                height = msObj.options.board_size[1],
+            var width = msObj.options.boardSize[0],
+                height = msObj.options.boardSize[1],
             // Total Mines is a percentage of the total number of cells
-                total_mines = msObj.options.num_mines,
+                totalMines = msObj.options.numMines,
                 array = [],
                 x,
                 max;
 
             // Put all mines in the beginning
             for (x = 0, max = width * height; x < max; x++) {
-                if (x < total_mines) {
+                if (x < totalMines) {
                     array[x] = 1;
                 } else {
                     array[x] = 0;
@@ -405,39 +409,40 @@ jQuery(function ($) {
             var level = $('#level').val();
 
             if (level === 'custom') {
-                var dim_x = parseInt($('#dim_x').val(), 10);
-                var dim_y = parseInt($('#dim_y').val(), 10);
-                var num_mines = parseInt($('#num_mines').val(), 10);
+                var dimX = parseInt($('#dim_x').val(), 10);
+                var dimY = parseInt($('#dim_y').val(), 10);
+                var numMines = parseInt($('#numMines').val(), 10);
 
                 // rationalise options JIC
-                if (isNaN(dim_x) || (dim_x == 0)) {
-                  dim_x = 1;
+                if (isNaN(dimX) || (dimX == 0)) {
+                  dimX = 1;
                 }
-                if (dim_x > MAX_X) {
-                  dim_x = MAX_X;
+                if (dimX > MAX_X) {
+                  dimX = MAX_X;
                 }
-                if (isNaN(dim_y) || (dim_y == 0)) {
-                  dim_y = 1;
+                if (isNaN(dimY) || (dimY == 0)) {
+                  dimY = 1;
                 }
-                if (dim_y > MAX_Y) {
-                  dim_y = MAX_Y;
+                if (dimY > MAX_Y) {
+                  dimY = MAX_Y;
                 }
-                if (isNaN(num_mines) || (num_mines == 0)) {
-                  num_mines = 1;
+                if (isNaN(numMines) || (numMines == 0)) {
+                  numMines = 1;
                 }
-                if (num_mines >= (dim_x * dim_y)) {
-                  num_mines=(dim_x * dim_y)-1;
+                if (numMines >= (dimX * dimY)) {
+                  numMines=(dimX * dimY)-1;
                 }
                 // refresh display with updated values
-                $('#dim_x').val(dim_x);
-                $('#dim_y').val(dim_y);
-                $('#num_mines').val(num_mines);
+                $('#dim_x').val(dimX);
+                $('#dim_y').val(dimY);
+                $('#num_mines').val(numMines);
 
-                msObj.options.board_size = [dim_x, dim_y];
-                msObj.options.num_mines = num_mines;
+                msObj.options.boardSize = [dimX, dimY];
+                msObj.options.numMines = numMines;
+
             } else {
-                msObj.options.board_size = levels[level].board_size;
-                msObj.options.num_mines = levels[level].num_mines;
+                msObj.options.boardSize = levels[level].boardSize;
+                msObj.options.numMines = levels[level].numMines;
             }
 
         };
@@ -461,26 +466,26 @@ jQuery(function ($) {
         this.resetDisplays = function () {
 
             var level = $('#level option:selected').val();
-            var num_mines;
+            var numMines;
 
             if (level === 'custom') {
-                num_mines = $('#num_mines').val();
+                numMines = $('#numMines').val();
             } else {
-                num_mines = levels[level].num_mines;
+                numMines = levels[level].numMines;
             }
 
-            $('#mine_flag_display').val(num_mines);
+            $('#mine_flag_display').val(numMines);
             $('#timer').val(0);
         };
 
         // clear & initialize the internal cell memory grid
         this.clearBoard = function () {
-            var width = msObj.options.board_size[0],
-                height = msObj.options.board_size[1],
+            var width = msObj.options.boardSize[0],
+                height = msObj.options.boardSize[1],
                 x,
                 y,
                 z = 0,
-                mine_hat = msObj.getRandomMineArray();
+                mineHat = msObj.getRandomMineArray();
 
             msObj.grid = [];
             for (y = 0; y < height; y++) {
@@ -489,7 +494,7 @@ jQuery(function ($) {
                     msObj.grid[y][x] = {
                         'state': STATE_UNKNOWN,
                         'number': 0,
-                        'mine': mine_hat[z++],
+                        'mine': mineHat[z++],
                         'x': x,
                         'y': y
                     };
@@ -500,9 +505,9 @@ jQuery(function ($) {
             if (!msObj.board) {
                 $(msObj.options.selector)
                     .html('')
-                    .append(msObj.get_template('settings'))
-                    .append(msObj.get_template('actions'))
-                    .append(msObj.get_template('status'))
+                    .append(msObj.getTemplate('settings'))
+                    .append(msObj.getTemplate('actions'))
+                    .append(msObj.getTemplate('status'))
                     .append('<div class="board-wrap"></div>');
                 msObj.board = $('.board-wrap');
                 msObj.board.attr('unselectable', 'on')
@@ -515,7 +520,10 @@ jQuery(function ($) {
                 var row = $('<ul class="row" data-index=' + y + '></ul>');
                 for (x = 0; x < width; x++) {
                     var cell;
-                    row.append('<li class="cell" data-coord="' + [x, y].join(',') + '" data-x=' + x + ' data-y=' + y + '>x</li>');
+                    row.append(
+                        '<li class="cell" data-coord="' + [x, y].join(',') + '" data-x=' + x +
+                        ' data-y=' + y + '>x</li>'
+                    );
                     cell = row.find('.cell:last');
                     msObj.drawCell(cell);
                 }
@@ -531,12 +539,13 @@ jQuery(function ($) {
             });
 
             if (msObj.worker) {
-                msObj.callWorker('calc_win',msObj.options.num_mines);
+                msObj.callWorker('calc_win',msObj.options.numMines);
             } else {
                 if (!window.touchAdjacent) {
-                    throw ("Could not load " + msObj.options.path_to_cell_toucher);
+                    throw ('Could not load ' + msObj.options.pathToCellToucher);
                 }
-                var win = minesweeperCalculateWin(msObj.grid);
+
+                var win = window.minesweeperCalculateWin(msObj.grid);
                 if (win) {
                     msObj.winGame();
                 }
@@ -560,7 +569,7 @@ jQuery(function ($) {
             try {
                 gridobj = msObj.grid[y][x];
             } catch (e) {
-                console.warn("Invalid grid coord: x,y = " + [x, y].join(','));
+                console.warn('Invalid grid coord: x,y = ' + [x, y].join(','));
                 return;
             }
             cell.html('');
@@ -572,7 +581,7 @@ jQuery(function ($) {
                     break;
                 case STATE_QUESTION:
                     cell.addClass('ui-icon ui-icon-help');
-                    // Break purposely left out
+                    /* falls through */
                 case STATE_UNKNOWN:
                 case STATE_OPEN:
                 case STATE_EXPLODE:
@@ -584,7 +593,7 @@ jQuery(function ($) {
                     cell.attr('data-number', gridobj.number);
                     break;
                 default:
-                    throw "Invalid gridobj state: " + gridobj.state;
+                    throw 'Invalid gridobj state: ' + gridobj.state;
             }
 
         };
@@ -597,14 +606,14 @@ jQuery(function ($) {
 
             msObj.stopTimer();
 
-            var width = msObj.options.board_size[0],
-                height = msObj.options.board_size[1],
+            var width = msObj.options.boardSize[0],
+                height = msObj.options.boardSize[1],
                 x,
                 y;
 
             if (cellParam) {
                 cellParam.removeClass();
-                cellParam.addClass("cell " + STATE_EXPLODE);
+                cellParam.addClass('cell ' + STATE_EXPLODE);
             }
             for (y = 0; y < height; y++) {
                 for (x = 0; x < width; x++) {
@@ -632,14 +641,16 @@ jQuery(function ($) {
         this.checkBestTime = function (time) {
             var level = $('#level').val();
             if (level !== 'custom') {
-                var best_time = localStorage.getItem('best_time_' + level);
+                var bestTime = localStorage.getItem('best_time_' + level);
 
-                if (!best_time || parseInt(time, 10) < parseInt(best_time, 10)) {
-                    var display_name = localStorage.getItem(level + '_record_holder');
-                    if (!display_name) {
-                        display_name = 'Your name';
+                if (!bestTime || parseInt(time, 10) < parseInt(bestTime, 10)) {
+                    var displayName = localStorage.getItem(level + '_record_holder');
+                    if (!displayName) {
+                        displayName = 'Your name';
                     }
-                    var name = window.prompt('Congrats! You beat the best ' + level + ' time!', display_name);
+                    var name = window.prompt(
+                        'Congrats! You beat the best ' + level + ' time!', displayName
+                    );
 
                     localStorage.setItem('best_time_' + level, time);
                     localStorage.setItem(level + '_record_holder', name);
@@ -647,11 +658,24 @@ jQuery(function ($) {
             }
         };
 
-        this.get_template = function (template) {
+        this.getTemplate = function (template) {
             var templates = {
-                'settings': '<div class="game_settings"><select id="level"><option value="beginner">Beginner</option><option value="intermediate">Intermediate</option><option value="expert">Expert</option><option value="custom">Custom</option></select>    <input type="text" id="dim_x" placeholder="x" size="5" disabled /><input type="text" id="dim_y" placeholder="y" size="5" disabled /><input type="text" id="num_mines" placeholder="mines" size="5" disabled /></div>',
-                'actions': '<div class="game_actions"><button class="new-game">New Game</button><button id="best_times">Best times</button></div>',
-                'status': '<div class="game_status"><label>Time:</label><input type="text" id="timer" size="6" value="0" readonly /><label>Mines:</label><input type="text" id="mine_flag_display" size="6" value="10" disabled />'
+                'settings':
+                    '<div class="game_settings"><select id="level"><option value="beginner">Beginner</option>' +
+                    '<option value="intermediate">Intermediate</option><option value="expert">Expert</option>' +
+                    '<option value="custom">Custom</option></select>' +
+                    '<input type="text" id="dim_x" placeholder="x" size="5" disabled />' +
+                    '<input type="text" id="dim_y" placeholder="y" size="5" disabled />' +
+                    '<input type="text" id="numMines" placeholder="mines" size="5" disabled />' +
+                    '</div>',
+                'actions':
+                    '<div class="game_actions"><button class="new-game">New Game</button>' +
+                    '<button id="bestTimes">Best times</button></div>',
+                'status':
+                    '<div class="game_status"><label>Time:</label>' +
+                    '<input type="text" id="timer" size="6" value="0" readonly />' +
+                    '<label>Mines:</label>' +
+                    '<input type="text" id="mine_flag_display" size="6" value="10" disabled />'
             };
 
             return templates[template];
