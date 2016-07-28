@@ -42,7 +42,6 @@ To Do:
 + Add animation and better graphics
 + Enhance UI for a sleek new look
 
-=======
 
 Contributing:
 -----------
