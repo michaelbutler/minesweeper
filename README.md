@@ -1,5 +1,7 @@
 Minesweeper.js
 ===========
+[![Build Status](https://travis-ci.org/michaelbutler/minesweeper.svg?branch=master)](https://travis-ci.org/michaelbutler/minesweeper)
+
 By Michael Butler
 
 A WebWorker powered Minesweeper game written in JavaScript, HTML and CSS. 
@@ -8,9 +10,8 @@ Demo: http://michaelbutler.github.io/minesweeper/
 
 Features:
 -----------
-+ Configurable grid size (X, Y)
 + User can choose difficulty level
-+ Configurable number of mines
++ Custom option with configurable grid size (X, Y) and number of mines
 + Stopwatch with score keeping (LocalStorage)
 + Stack based grid traversal algorithm for memory efficiency
 + HTML5 web worker (if supported) will be used to perform the stack algorithm outside of the UI thread
@@ -38,9 +39,13 @@ Example HTML usage:
 
 To Do:
 -----------
-+ Auto-clear feature to clear multiple squares at once
 + Add animation and better graphics
 + Enhance UI for a sleek new look
+
+
+Contributing:
+-----------
+See [CONTRIBUTE.md](https://github.com/michaelbutler/minesweeper/blob/master/CONTRIBUTE.md) for how to contribute.
 
 
 License:
