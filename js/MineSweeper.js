@@ -53,6 +53,8 @@ jQuery(function ($) {
         STATE_QUESTION = 'question';
     var LEFT_MOUSE_BUTTON = 1,
         RIGHT_MOUSE_BUTTON = 3;
+    var MAX_X = 30,
+        MAX_Y = 30;
 
     MineSweeper = function () {
         // prevent namespace pollution
@@ -181,7 +183,15 @@ jQuery(function ($) {
             msUI.on('mouseup','.cell', function (ev) {
                 var targ = $(ev.target);
                 if (ev.which === LEFT_MOUSE_BUTTON) {
-                    msObj.handleLeftClick(targ);
+                    if (ev.shiftKey || ev.ctrlKey) {
+                        msObj.MODIFIER_KEY_DOWN = true;
+                        setTimeout(function () {
+                            msObj.MODIFIER_KEY_DOWN = false;
+                        }, 50);
+                        msObj.handleRightClick(targ);
+                    } else {
+                        msObj.handleLeftClick(targ);
+                    }
                 } else if (ev.which === RIGHT_MOUSE_BUTTON) {
                     msObj.handleRightClick(targ);
                 }
@@ -237,7 +247,7 @@ jQuery(function ($) {
 
             if (obj.state === STATE_NUMBER) {
                 // auto clear neighbor cells
-                if (msObj.LEFT_MOUSE_DOWN) {
+                if (msObj.LEFT_MOUSE_DOWN || msObj.MODIFIER_KEY_DOWN) {
                     msObj.callWorker('get_adjacent', obj);
                 }
                 return;
@@ -387,7 +397,9 @@ jQuery(function ($) {
                 }
             }
 
-            fisherYates(array);
+            do {
+                fisherYates(array);
+            } while(array[0] === 1);
 
             return array;
         };
@@ -401,8 +413,33 @@ jQuery(function ($) {
                 var dimY = parseInt($('#dim_y').val(), 10);
                 var numMines = parseInt($('#numMines').val(), 10);
 
+                // rationalise options JIC
+                if (isNaN(dimX) || (dimX === 0)) {
+                    dimX = 1;
+                }
+                if (dimX > MAX_X) {
+                    dimX = MAX_X;
+                }
+                if (isNaN(dimY) || (dimY === 0)) {
+                    dimY = 1;
+                }
+                if (dimY > MAX_Y) {
+                    dimY = MAX_Y;
+                }
+                if (isNaN(numMines) || (numMines === 0)) {
+                    numMines = 1;
+                }
+                if (numMines >= (dimX * dimY)) {
+                    numMines=(dimX * dimY)-1;
+                }
+                // refresh display with updated values
+                $('#dim_x').val(dimX);
+                $('#dim_y').val(dimY);
+                $('#num_mines').val(numMines);
+
                 msObj.options.boardSize = [dimX, dimY];
                 msObj.options.numMines = numMines;
+
             } else {
                 msObj.options.boardSize = levels[level].boardSize;
                 msObj.options.numMines = levels[level].numMines;
