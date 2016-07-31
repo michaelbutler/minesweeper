@@ -416,21 +416,18 @@ jQuery(function ($) {
                 // rationalise options JIC
                 if (isNaN(dimX) || (dimX === 0)) {
                     dimX = 1;
-                }
-                if (dimX > MAX_X) {
+                } else if (dimX > MAX_X) {
                     dimX = MAX_X;
                 }
                 if (isNaN(dimY) || (dimY === 0)) {
                     dimY = 1;
-                }
-                if (dimY > MAX_Y) {
+                } else if (dimY > MAX_Y) {
                     dimY = MAX_Y;
                 }
                 if (isNaN(numMines) || (numMines === 0)) {
                     numMines = 1;
-                }
-                if (numMines >= (dimX * dimY)) {
-                    numMines=(dimX * dimY)-1;
+                } else if (numMines >= (dimX * dimY)) {
+                    numMines = (dimX * dimY) - 1;
                 }
                 // refresh display with updated values
                 $('#dim_x').val(dimX);
