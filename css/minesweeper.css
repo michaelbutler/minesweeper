@@ -1,4 +1,4 @@
-/* minesweeper.css */
+﻿/* minesweeper.css */
 
 html, body {
    margin: 0;
@@ -36,6 +36,15 @@ h1 {
    -webkit-user-select: none;
    user-select: none;
    cursor: default;
+   background-image: none;
+}
+
+.board-wrap.paused {
+   background: url(../paused.png) no-repeat left center;
+}
+
+.board-wrap.paused ul {
+   visibility: hidden;
 }
 
 .board-wrap .row {
@@ -113,6 +122,21 @@ h1 {
    color: darkgreen;
 }
 .cell[data-number="3"] {
+   color: darkblue;
+}
+.cell[data-number="4"] {
+   color: red;
+}
+.cell[data-number="5"] {
+   color: red;
+}
+.cell[data-number="6"] {
+   color: red;
+}
+.cell[data-number="7"] {
+   color: red;
+}
+.cell[data-number="8"] {
    color: red;
 }
 

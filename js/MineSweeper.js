@@ -197,10 +197,12 @@ jQuery(function ($) {
                 }
             });
 
-            $('.new-game').on('click', function (ev) {
+            $('#newGame').on('click', function (ev) {
                 ev.preventDefault();
                 msObj.stopTimer();
                 msObj.timer = '';
+                msObj.paused = false;
+                msObj.board.removeClass('paused');
                 msObj.running = true;
                 msObj.setBoardOptions();
                 msObj.clearBoard();
@@ -215,22 +217,31 @@ jQuery(function ($) {
                 } else {
                     input.prop('disabled', true);
                 }
-                $('.new-game').trigger('click');
+                $('#newGame').trigger('click');
             });
 
-            $('#best_times').on('click', function () {
+            $('#bestTimes').on('click', function () {
                 var beginnerTime = localStorage.getItem('best_time_beginner') || 'None';
                 var intermediateTime = localStorage.getItem('best_time_intermediate') || 'None';
                 var expertTime = localStorage.getItem('best_time_expert') || 'None';
                 var beginnerName = localStorage.getItem('beginner_record_holder') || 'None';
                 var intermediateName = localStorage.getItem('intermediate_record_holder') || 'None';
                 var expertName = localStorage.getItem('expert_record_holder') || 'None';
-                alert('Best times:\nBeginner:\t' + beginnerName + '\t' + beginnerTime + '\n' +
-                    'Intermediate:\t' + intermediateName + '\t' + intermediateTime + '\n' +
-                    'Expert:\t' + expertName + '\t' + expertTime);
+                alert('Best times:\nBeginner:     ' + beginnerName + ' : ' + beginnerTime + '\n' +
+                    'Intermediate: ' + intermediateName + ' : ' + intermediateTime + '\n' +
+                    'Expert:       ' + expertName + ' : ' + expertTime);
             });
 
-        };
+             $('#pause').on('click', function (ev) {
+              if (msObj.paused) {
+                msObj.resumeGame();
+              } else if(msObj.timer) {
+                msObj.pauseGame();
+              }
+              ev.preventDefault();
+            });
+
+       };
 
         /**
          * @return void
@@ -320,6 +331,25 @@ jQuery(function ($) {
                 // redraw board from memory representation
                 msObj.redrawBoard();
             }
+        };
+
+        this.pauseGame = function () {
+            // hide board so they can't cheat
+            msObj.board.addClass('paused');
+            // pause stopwatch
+            msObj.stopTimer();
+            // toggle button
+            $('#pause')[0].innerHTML = 'Resume';
+            msObj.paused=true;
+        };
+        
+        this.resumeGame = function () {
+            // show board
+            msObj.board.removeClass('paused');
+            // resume stopwatch
+            msObj.resumeTimer();
+            // toggle button
+            msObj.paused = false;
         };
 
         this.handleWorkerMessage = function (data) {
@@ -416,14 +446,12 @@ jQuery(function ($) {
                 // rationalise options JIC
                 if (isNaN(dimX) || (dimX === 0)) {
                     dimX = 1;
-                }
-                if (dimX > MAX_X) {
+                } else if (dimX > MAX_X) {
                     dimX = MAX_X;
                 }
                 if (isNaN(dimY) || (dimY === 0)) {
                     dimY = 1;
-                }
-                if (dimY > MAX_Y) {
+                } else if (dimY > MAX_Y) {
                     dimY = MAX_Y;
                 }
                 if (isNaN(numMines) || (numMines === 0)) {
@@ -450,17 +478,25 @@ jQuery(function ($) {
         this.startTimer = function () {
             var timerElement = $('#timer');
             timerElement.val(0);
-            console.log('starting timer');
-            msObj.timer = window.setInterval(function () {
-                var curr = parseInt(timerElement.val(), 10);
-                timerElement.val(curr + 1);
-            }, 1000);
+            $('#pause').show();
+            msObj.resumeTimer();
         };
 
         this.stopTimer = function () {
             if (msObj.timer) {
-                window.clearInterval(msObj.timer);
+              console.log('stopping timer');
+              window.clearInterval(msObj.timer);
             }
+        };
+        
+        this.resumeTimer = function () {
+            $('#pause')[0].innerHTML = 'Pause';
+            var timerElement = $('#timer');
+            console.log('resuming timer');
+            msObj.timer = window.setInterval(function () {
+                var curr = parseInt(timerElement.val(), 10);
+                timerElement.val(curr + 1);
+            }, 1000);
         };
 
         this.resetDisplays = function () {
@@ -476,6 +512,7 @@ jQuery(function ($) {
 
             $('#mine_flag_display').val(numMines);
             $('#timer').val(0);
+            $('#pause').hide();
         };
 
         // clear & initialize the internal cell memory grid
@@ -605,6 +642,7 @@ jQuery(function ($) {
         this.gameOver = function (cellParam) {
 
             msObj.stopTimer();
+            $('#pause').hide();
 
             var width = msObj.options.boardSize[0],
                 height = msObj.options.boardSize[1],
@@ -632,6 +670,7 @@ jQuery(function ($) {
 
         this.winGame = function () {
             msObj.stopTimer();
+            $('#pause').hide();
             msObj.running = false;
             var time = $('#timer').val();
             alert('You win!\nYour time: ' + time);
@@ -641,16 +680,15 @@ jQuery(function ($) {
         this.checkBestTime = function (time) {
             var level = $('#level').val();
             if (level !== 'custom') {
-                var bestTime = localStorage.getItem('best_time_' + level);
+                var best_time = localStorage.getItem('best_time_' + level);
 
-                if (!bestTime || parseInt(time, 10) < parseInt(bestTime, 10)) {
-                    var displayName = localStorage.getItem(level + '_record_holder');
-                    if (!displayName) {
-                        displayName = 'Your name';
-                    }
-                    var name = window.prompt(
-                        'Congrats! You beat the best ' + level + ' time!', displayName
-                    );
+                if (!best_time || parseInt(time, 10) < parseInt(best_time, 10)) {
+                    var display_name = localStorage.getItem(level + '_record_holder');
+                    if (!display_name) display_name = localStorage.getItem('beginner_record_holder');
+                    if (!display_name) display_name = localStorage.getItem('intermediate_record_holder');
+                    if (!display_name) display_name = localStorage.getItem('expert_record_holder');
+                    if (!display_name) display_name = 'Your name';
+                    var name = window.prompt('Congrats! You beat the best ' + level + ' time!', display_name);
 
                     localStorage.setItem('best_time_' + level, time);
                     localStorage.setItem(level + '_record_holder', name);
@@ -669,8 +707,9 @@ jQuery(function ($) {
                     '<input type="text" id="numMines" placeholder="mines" size="5" disabled />' +
                     '</div>',
                 'actions':
-                    '<div class="game_actions"><button class="new-game">New Game</button>' +
-                    '<button id="bestTimes">Best times</button></div>',
+                    '<div class="game_actions"><button id="newGame">New Game</button>' +
+                    '<button id="bestTimes">Best times</button>' +
+                    '<button id="pause">Pause</button></div>',
                 'status':
                     '<div class="game_status"><label>Time:</label>' +
                     '<input type="text" id="timer" size="6" value="0" readonly />' +
