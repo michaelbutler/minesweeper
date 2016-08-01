@@ -232,16 +232,16 @@ jQuery(function ($) {
                     'Expert:       ' + expertName + ' : ' + expertTime);
             });
 
-             $('#pause').on('click', function (ev) {
-              if (msObj.paused) {
-                msObj.resumeGame();
-              } else if(msObj.timer) {
-                msObj.pauseGame();
-              }
-              ev.preventDefault();
+            $('#pause').on('click', function (ev) {
+                if (msObj.paused) {
+                    msObj.resumeGame();
+                } else if(msObj.timer) {
+                    msObj.pauseGame();
+                }
+                ev.preventDefault();
             });
 
-       };
+        };
 
         /**
          * @return void
@@ -484,8 +484,8 @@ jQuery(function ($) {
 
         this.stopTimer = function () {
             if (msObj.timer) {
-              console.log('stopping timer');
-              window.clearInterval(msObj.timer);
+                console.log('stopping timer');
+                window.clearInterval(msObj.timer);
             }
         };
 
@@ -684,10 +684,20 @@ jQuery(function ($) {
 
                 if (!bestTime  || parseInt(time, 10) < parseInt(bestTime, 10)) {
                     var displayName = localStorage.getItem(level + '_record_holder');
-                    if (!displayName) displayName = localStorage.getItem('beginner_record_holder');
-                    if (!displayName) displayName = localStorage.getItem('intermediate_record_holder');
-                    if (!displayName) displayName = localStorage.getItem('expert_record_holder');
-                    if (!displayName) displayName = 'Your name';
+
+                    if (!displayName) {
+                        displayName = localStorage.getItem('beginner_record_holder');
+                    }
+                    if (!displayName) {
+                        displayName = localStorage.getItem('intermediate_record_holder');
+                    }
+                    if (!displayName) {
+                        displayName = localStorage.getItem('expert_record_holder');
+                    }
+                    if (!displayName) {
+                        displayName = 'Your name';
+                    }
+
                     var name = window.prompt('Congrats! You beat the best ' + level + ' time!', displayName);
 
                     localStorage.setItem('best_time_' + level, time);
