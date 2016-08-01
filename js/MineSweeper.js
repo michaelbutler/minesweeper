@@ -682,6 +682,7 @@ jQuery(function ($) {
             if (level !== 'custom') {
                 var bestTime = localStorage.getItem('best_time_' + level);
 
+                if (!bestTime  || parseInt(time, 10) < parseInt(bestTime, 10)) {
                     var displayName = localStorage.getItem(level + '_record_holder');
                     if (!displayName) displayName = localStorage.getItem('beginner_record_holder');
                     if (!displayName) displayName = localStorage.getItem('intermediate_record_holder');
