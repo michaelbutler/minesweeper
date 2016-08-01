@@ -488,7 +488,7 @@ jQuery(function ($) {
               window.clearInterval(msObj.timer);
             }
         };
-        
+
         this.resumeTimer = function () {
             $('#pause')[0].innerHTML = 'Pause';
             var timerElement = $('#timer');
@@ -680,15 +680,14 @@ jQuery(function ($) {
         this.checkBestTime = function (time) {
             var level = $('#level').val();
             if (level !== 'custom') {
-                var best_time = localStorage.getItem('best_time_' + level);
+                var bestTime = localStorage.getItem('best_time_' + level);
 
-                if (!best_time || parseInt(time, 10) < parseInt(best_time, 10)) {
-                    var display_name = localStorage.getItem(level + '_record_holder');
-                    if (!display_name) display_name = localStorage.getItem('beginner_record_holder');
-                    if (!display_name) display_name = localStorage.getItem('intermediate_record_holder');
-                    if (!display_name) display_name = localStorage.getItem('expert_record_holder');
-                    if (!display_name) display_name = 'Your name';
-                    var name = window.prompt('Congrats! You beat the best ' + level + ' time!', display_name);
+                    var displayName = localStorage.getItem(level + '_record_holder');
+                    if (!displayName) displayName = localStorage.getItem('beginner_record_holder');
+                    if (!displayName) displayName = localStorage.getItem('intermediate_record_holder');
+                    if (!displayName) displayName = localStorage.getItem('expert_record_holder');
+                    if (!displayName) displayName = 'Your name';
+                    var name = window.prompt('Congrats! You beat the best ' + level + ' time!', displayName);
 
                     localStorage.setItem('best_time_' + level, time);
                     localStorage.setItem(level + '_record_holder', name);
