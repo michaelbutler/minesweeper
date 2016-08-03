@@ -400,7 +400,8 @@ jQuery(function ($) {
                 totalMines = msObj.options.numMines,
                 array = [],
                 x,
-                max;
+                max,
+                infiniteLoop = 0;
 
             // Put all mines in the beginning
             for (x = 0, max = width * height; x < max; x++) {
@@ -429,6 +430,10 @@ jQuery(function ($) {
 
             do {
                 fisherYates(array);
+                infiniteLoop += 1;
+                if (infiniteLoop > 20) {
+                    break;
+                }
             } while(array[0] === 1);
 
             return array;
@@ -456,9 +461,8 @@ jQuery(function ($) {
                 }
                 if (isNaN(numMines) || (numMines === 0)) {
                     numMines = 1;
-                }
-                if (numMines >= (dimX * dimY)) {
-                    numMines=(dimX * dimY)-1;
+                } else if (numMines >= (dimX * dimY)) {
+                    numMines = (dimX * dimY) - 1;
                 }
                 // refresh display with updated values
                 $('#dim_x').val(dimX);
@@ -712,8 +716,8 @@ jQuery(function ($) {
                     '<div class="game_settings"><select id="level"><option value="beginner">Beginner</option>' +
                     '<option value="intermediate">Intermediate</option><option value="expert">Expert</option>' +
                     '<option value="custom">Custom</option></select>' +
-                    '<input type="text" id="dim_x" placeholder="x" size="5" disabled />' +
-                    '<input type="text" id="dim_y" placeholder="y" size="5" disabled />' +
+                    '<input type="text" id="dim_x" placeholder="x" size="5" disabled value="20" />' +
+                    '<input type="text" id="dim_y" placeholder="y" size="5" disabled value="20" />' +
                     '<input type="text" id="numMines" placeholder="mines" size="5" disabled />' +
                     '</div>',
                 'actions':
