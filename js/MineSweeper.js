@@ -715,12 +715,17 @@ jQuery(function ($) {
         this.getTemplate = function (template) {
             var templates = {
                 'settings':
-                    '<div class="game_settings"><select id="level" class="msLevel"><option value="beginner">Beginner</option>' +
-                    '<option value="intermediate">Intermediate</option><option value="expert">Expert</option>' +
+                    '<div class="game_settings"><select id="level" class="msLevel">' +
+                    '<option value="beginner">Beginner</option>' +
+                    '<option value="intermediate">Intermediate</option>' +
+                    '<option value="expert">Expert</option>' +
                     '<option value="custom">Custom</option></select>' +
-                    '<input type="text" id="dim_x" class="msDimX" placeholder="x" size="5" disabled value="20" />' +
-                    '<input type="text" id="dim_y" class="msDimY" placeholder="y" size="5" disabled value="20" />' +
-                    '<input type="text" id="numMines" class="msNumMines" placeholder="mines" size="5" disabled />' +
+                    '<input type="text" id="dim_x" ' +
+                        'class="msDimX" placeholder="x" size="5" disabled value="20" />' +
+                    '<input type="text" id="dim_y" ' +
+                        'class="msDimY" placeholder="y" size="5" disabled value="20" />' +
+                    '<input type="text" id="numMines" ' +
+                        'class="msNumMines" placeholder="mines" size="5" disabled />' +
                     '</div>',
                 'actions':
                     '<div class="game_actions"><button id="newGame" class="msNewGame">New Game</button>' +
@@ -730,7 +735,8 @@ jQuery(function ($) {
                     '<div class="game_status"><label>Time:</label>' +
                     '<input type="text" id="timer" class="msTimer" size="6" value="0" readonly />' +
                     '<label>Mines:</label>' +
-                    '<input type="text" id="mine_flag_display" class="msMineFlagDisplay" size="6" value="10" disabled />'
+                    '<input type="text" id="mine_flag_display" ' +
+                        'class="msMineFlagDisplay" size="6" value="10" disabled />'
             };
 
             return templates[template];
