@@ -159,7 +159,7 @@ jQuery(function ($) {
                 }
             });
 
-            msUI.on('mousedown','.cell', function (ev) {
+            msUI.on('mousedown', '.cell', function (ev) {
                 var targ = $(ev.target);
                 if ((ev.which === LEFT_MOUSE_BUTTON && msObj.RIGHT_MOUSE_DOWN) ||
                     (ev.which === RIGHT_MOUSE_BUTTON && msObj.LEFT_MOUSE_DOWN)
@@ -180,7 +180,7 @@ jQuery(function ($) {
                 }
             });
 
-            msUI.on('mouseup','.cell', function (ev) {
+            msUI.on('mouseup', '.cell', function (ev) {
                 var targ = $(ev.target);
                 if (ev.which === LEFT_MOUSE_BUTTON) {
                     if (ev.shiftKey || ev.ctrlKey) {
@@ -197,7 +197,7 @@ jQuery(function ($) {
                 }
             });
 
-            $('#newGame').on('click', function (ev) {
+            $('.msNewGame').on('click', function (ev) {
                 ev.preventDefault();
                 msObj.stopTimer();
                 msObj.timer = '';
@@ -210,17 +210,17 @@ jQuery(function ($) {
                 msObj.resetDisplays();
             });
 
-            $('#level').on('change', function () {
+            $('.msLevel').on('change', function () {
                 var input = $('.game_settings input');
-                if ($('#level option:selected').val() === 'custom') {
+                if ($('.msLevel option:selected').val() === 'custom') {
                     input.prop('disabled', false);
                 } else {
                     input.prop('disabled', true);
                 }
-                $('#newGame').trigger('click');
+                $('.msNewGame').trigger('click');
             });
 
-            $('#bestTimes').on('click', function () {
+            $('.msBestTimes').on('click', function () {
                 var beginnerTime = localStorage.getItem('best_time_beginner') || 'None';
                 var intermediateTime = localStorage.getItem('best_time_intermediate') || 'None';
                 var expertTime = localStorage.getItem('best_time_expert') || 'None';
@@ -232,7 +232,7 @@ jQuery(function ($) {
                     'Expert:       ' + expertName + ' : ' + expertTime);
             });
 
-            $('#pause').on('click', function (ev) {
+            $('.msPause').on('click', function (ev) {
                 if (msObj.paused) {
                     msObj.resumeGame();
                 } else if(msObj.timer) {
@@ -270,7 +270,7 @@ jQuery(function ($) {
             if (obj.state === STATE_QUESTION) {
                 obj.state = STATE_UNKNOWN;
             } else {
-                var flagDisplay = $('#mine_flag_display'),
+                var flagDisplay = $('.msMineFlagDisplay'),
                     curr = parseInt(flagDisplay.val(), 10);
                 if (obj.state === STATE_UNKNOWN) {
                     obj.state = STATE_FLAGGED;
@@ -339,7 +339,7 @@ jQuery(function ($) {
             // pause stopwatch
             msObj.stopTimer();
             // toggle button
-            $('#pause')[0].innerHTML = 'Resume';
+            $('.msPause')[0].innerHTML = 'Resume';
             msObj.paused=true;
         };
         
@@ -432,6 +432,7 @@ jQuery(function ($) {
                 fisherYates(array);
                 infiniteLoop += 1;
                 if (infiniteLoop > 20) {
+                    console.warn('Giving up trying to set top-left mine to space');
                     break;
                 }
             } while(array[0] === 1);
@@ -441,12 +442,12 @@ jQuery(function ($) {
 
         // set the board size and mine density
         this.setBoardOptions = function () {
-            var level = $('#level').val();
+            var level = $('.msLevel').val();
 
             if (level === 'custom') {
-                var dimX = parseInt($('#dim_x').val(), 10);
-                var dimY = parseInt($('#dim_y').val(), 10);
-                var numMines = parseInt($('#numMines').val(), 10);
+                var dimX = parseInt($('.msDimX').val(), 10);
+                var dimY = parseInt($('.msDimY').val(), 10);
+                var numMines = parseInt($('.msNumMines').val(), 10);
 
                 // rationalise options JIC
                 if (isNaN(dimX) || (dimX === 0)) {
@@ -461,13 +462,14 @@ jQuery(function ($) {
                 }
                 if (isNaN(numMines) || (numMines === 0)) {
                     numMines = 1;
-                } else if (numMines >= (dimX * dimY)) {
+                }
+                if (numMines >= (dimX * dimY)) {
                     numMines = (dimX * dimY) - 1;
                 }
                 // refresh display with updated values
-                $('#dim_x').val(dimX);
-                $('#dim_y').val(dimY);
-                $('#num_mines').val(numMines);
+                $('.msDimX').val(dimX);
+                $('.msDimY').val(dimY);
+                $('.msNumMines').val(numMines);
 
                 msObj.options.boardSize = [dimX, dimY];
                 msObj.options.numMines = numMines;
@@ -480,9 +482,9 @@ jQuery(function ($) {
         };
 
         this.startTimer = function () {
-            var timerElement = $('#timer');
+            var timerElement = $('.msTimer');
             timerElement.val(0);
-            $('#pause').show();
+            $('.msPause').show();
             msObj.resumeTimer();
         };
 
@@ -494,8 +496,8 @@ jQuery(function ($) {
         };
 
         this.resumeTimer = function () {
-            $('#pause')[0].innerHTML = 'Pause';
-            var timerElement = $('#timer');
+            $('.msPause')[0].innerHTML = 'Pause';
+            var timerElement = $('.msTimer');
             console.log('resuming timer');
             msObj.timer = window.setInterval(function () {
                 var curr = parseInt(timerElement.val(), 10);
@@ -505,18 +507,18 @@ jQuery(function ($) {
 
         this.resetDisplays = function () {
 
-            var level = $('#level option:selected').val();
+            var level = $('.msLevel option:selected').val();
             var numMines;
 
             if (level === 'custom') {
-                numMines = $('#numMines').val();
+                numMines = $('.msNumMines').val();
             } else {
                 numMines = levels[level].numMines;
             }
 
-            $('#mine_flag_display').val(numMines);
-            $('#timer').val(0);
-            $('#pause').hide();
+            $('.msNumMinesDisplay').val(numMines);
+            $('.msTimer').val(0);
+            $('.msPause').hide();
         };
 
         // clear & initialize the internal cell memory grid
@@ -646,7 +648,7 @@ jQuery(function ($) {
         this.gameOver = function (cellParam) {
 
             msObj.stopTimer();
-            $('#pause').hide();
+            $('.msPause').hide();
 
             var width = msObj.options.boardSize[0],
                 height = msObj.options.boardSize[1],
@@ -674,19 +676,19 @@ jQuery(function ($) {
 
         this.winGame = function () {
             msObj.stopTimer();
-            $('#pause').hide();
+            $('.msPause').hide();
             msObj.running = false;
-            var time = $('#timer').val();
+            var time = $('.msTimer').val();
             alert('You win!\nYour time: ' + time);
             msObj.checkBestTime(time);
         };
 
         this.checkBestTime = function (time) {
-            var level = $('#level').val();
+            var level = $(',msLevel').val();
             if (level !== 'custom') {
                 var bestTime = localStorage.getItem('best_time_' + level);
 
-                if (!bestTime  || parseInt(time, 10) < parseInt(bestTime, 10)) {
+                if (!bestTime || parseInt(time, 10) < parseInt(bestTime, 10)) {
                     var displayName = localStorage.getItem(level + '_record_holder');
 
                     if (!displayName) {
@@ -713,22 +715,22 @@ jQuery(function ($) {
         this.getTemplate = function (template) {
             var templates = {
                 'settings':
-                    '<div class="game_settings"><select id="level"><option value="beginner">Beginner</option>' +
+                    '<div class="game_settings"><select id="level" class="msLevel"><option value="beginner">Beginner</option>' +
                     '<option value="intermediate">Intermediate</option><option value="expert">Expert</option>' +
                     '<option value="custom">Custom</option></select>' +
-                    '<input type="text" id="dim_x" placeholder="x" size="5" disabled value="20" />' +
-                    '<input type="text" id="dim_y" placeholder="y" size="5" disabled value="20" />' +
-                    '<input type="text" id="numMines" placeholder="mines" size="5" disabled />' +
+                    '<input type="text" id="dim_x" class="msDimX" placeholder="x" size="5" disabled value="20" />' +
+                    '<input type="text" id="dim_y" class="msDimY" placeholder="y" size="5" disabled value="20" />' +
+                    '<input type="text" id="numMines" class="msNumMines" placeholder="mines" size="5" disabled />' +
                     '</div>',
                 'actions':
-                    '<div class="game_actions"><button id="newGame">New Game</button>' +
-                    '<button id="bestTimes">Best times</button>' +
-                    '<button id="pause">Pause</button></div>',
+                    '<div class="game_actions"><button id="newGame" class="msNewGame">New Game</button>' +
+                    '<button id="bestTimes" class="msBestTimes">Best times</button>' +
+                    '<button id="pause" class="msPause">Pause</button></div>',
                 'status':
                     '<div class="game_status"><label>Time:</label>' +
-                    '<input type="text" id="timer" size="6" value="0" readonly />' +
+                    '<input type="text" id="timer" class="msTimer" size="6" value="0" readonly />' +
                     '<label>Mines:</label>' +
-                    '<input type="text" id="mine_flag_display" size="6" value="10" disabled />'
+                    '<input type="text" id="mine_flag_display" class="msMineFlagDisplay" size="6" value="10" disabled />'
             };
 
             return templates[template];
