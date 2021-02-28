@@ -1,6 +1,6 @@
 dist: focal
-# Select something that is not JS since we are only using docker
-language: php
+# Minimal because we do everything in docker
+language: minimal
 services:
   - docker
 before_install:
