@@ -253,16 +253,29 @@ jQuery(function ($) {
         let intermediateName =
           localStorage.getItem('intermediate_record_holder') || 'None';
         let expertName = localStorage.getItem('expert_record_holder') || 'None';
-        alert('Best times:\nBeginner:     ' + beginnerName + ' : ' + beginnerTime + '\n' +
-          'Intermediate: ' + intermediateName + ' : ' + intermediateTime + '\n' +
-          'Expert:       ' + expertName + ' : ' + expertTime);
+        alert(
+          'Best times:\nBeginner:     ' +
+            beginnerName +
+            ' : ' +
+            beginnerTime +
+            '\n' +
+            'Intermediate: ' +
+            intermediateName +
+            ' : ' +
+            intermediateTime +
+            '\n' +
+            'Expert:       ' +
+            expertName +
+            ' : ' +
+            expertTime
+        );
       });
 
       $('.msPause').on('click', function (ev) {
         ev.preventDefault();
         if (msObj.paused) {
           msObj.resumeGame();
-        } else if(msObj.timer) {
+        } else if (msObj.timer) {
           msObj.pauseGame();
         }
       });
@@ -464,7 +477,9 @@ jQuery(function ($) {
         fisherYates(array);
         infiniteLoop += 1;
         if (infiniteLoop > 999) {
-          console.warn('Giving up trying to prevent initial space from blowing up');
+          console.warn(
+            'Giving up trying to prevent initial space from blowing up'
+          );
           break;
         }
       } while (array[safeIndex] === 1);

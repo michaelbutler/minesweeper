@@ -124,22 +124,22 @@ h1 {
 .cell[data-number='2'] {
   color: darkgreen;
 }
-.cell[data-number="3"] {
+.cell[data-number='3'] {
   color: red;
 }
-.cell[data-number="4"] {
+.cell[data-number='4'] {
   color: darkblue;
 }
-.cell[data-number="5"] {
+.cell[data-number='5'] {
   color: darkblue;
 }
-.cell[data-number="6"] {
+.cell[data-number='6'] {
   color: darkblue;
 }
-.cell[data-number="7"] {
+.cell[data-number='7'] {
   color: darkblue;
 }
-.cell[data-number="8"] {
+.cell[data-number='8'] {
   color: darkblue;
 }
 
