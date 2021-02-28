@@ -1,5 +1,6 @@
 dist: focal
-language: node_js
+# Select something that is not JS since we are only using docker
+language: php
 services:
   - docker
 before_install:
