@@ -3,8 +3,10 @@ build-ci:
 	# Build docker image for CI-CD purposes
 	docker build -t ci-testing:latest .
 
-ci: build-ci
-	# Fail if any JS or CSS file doesn't match the standard
+ci: build-ci travis
+
+travis:
+	# Check if any JS or CSS file doesn't match the standard
 	docker run --rm ci-testing:latest npx prettier --check .
 	docker run --rm ci-testing:latest npx jshint js/
 	@echo "✅️ SUCCESS"
