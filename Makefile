@@ -19,3 +19,7 @@ format: build-ci
 local-server:
 	# Spin up a local server using PHP
 	php -S 127.0.0.1:8080
+
+local-python:
+	# Spin up a local server using Python
+	python -m SimpleHTTPServer 8080

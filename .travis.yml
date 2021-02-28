@@ -1,5 +1,6 @@
 dist: focal
-language: node_js
+# Minimal because we do everything in docker
+language: minimal
 services:
   - docker
 before_install:

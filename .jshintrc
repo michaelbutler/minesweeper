@@ -15,7 +15,7 @@
 
   // disAllow ES6.
   // Doesn't work until JSHint 2.5
-  // "esversion": 5,
+  "esversion": 6,
 
   /*
    * ENFORCING OPTIONS
@@ -35,8 +35,8 @@
   // Prohibit use of a variable before it is defined.
   "latedef": true,
 
-  // Enforce line length to 100 characters
-  "maxlen": 115,
+  // Enforce line length to N characters
+  "maxlen": 120,
 
   // Require capitalized names for constructor functions.
   "newcap": true,

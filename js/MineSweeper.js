@@ -6,7 +6,7 @@
 
  Dependencies: jQuery, jQuery UI CSS (for icons)
 
- This file is part of Minesweeper.js.
+ This file is part of MineSweeper.js.
 
  Minesweeper.js is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ jQuery(function ($) {
   'use strict';
 
   // standard level configurations
-  var levels = {
+  let levels = {
     beginner: {
       boardSize: [9, 9],
       numMines: 10,
@@ -44,15 +44,15 @@ jQuery(function ($) {
   };
 
   // "Static Constants"
-  var STATE_UNKNOWN = 'unknown',
+  let STATE_UNKNOWN = 'unknown',
     STATE_OPEN = 'open',
     STATE_NUMBER = 'number',
     STATE_FLAGGED = 'flagged',
     STATE_EXPLODE = 'explode',
     STATE_QUESTION = 'question';
-  var LEFT_MOUSE_BUTTON = 1,
+  let LEFT_MOUSE_BUTTON = 1,
     RIGHT_MOUSE_BUTTON = 3;
-  var MAX_X = 30,
+  let MAX_X = 30,
     MAX_Y = 30;
 
   MineSweeper = function () {
@@ -60,10 +60,12 @@ jQuery(function ($) {
     if (!(this instanceof MineSweeper)) {
       throw 'Invalid use of Minesweeper';
     }
-    var msObj = this;
+    let msObj = this;
     this.options = {};
     this.grid = [];
     this.running = true;
+    // Controls whether mines were assigned to cells yet. First click should always be safe.
+    this.minesDealt = false;
     this.defaults = {
       selector: '#minesweeper',
       boardSize: levels.beginner.boardSize,
@@ -89,6 +91,7 @@ jQuery(function ($) {
       msObj.redrawBoard();
       msObj.resetDisplays();
       msObj.initHandlers(msUI);
+      msObj.initCleanUpTimer();
       return msObj;
     };
 
@@ -99,7 +102,7 @@ jQuery(function ($) {
      */
     this.callWorker = function (taskType, payload) {
       $('.ajax-loading').removeClass('invisible');
-      var job = {
+      let job = {
         type: taskType, // message type
         grid: msObj.grid,
       };
@@ -117,7 +120,7 @@ jQuery(function ($) {
         // Create a background web worker to process the grid "painting" with a stack
         msObj.worker = new Worker(wPath);
         msObj.worker.onmessage = function (e) {
-          var data = JSON.parse(e.data);
+          let data = JSON.parse(e.data);
           msObj.handleWorkerMessage(data);
         };
       } else {
@@ -128,9 +131,31 @@ jQuery(function ($) {
       }
     };
 
+    this.initCleanUpTimer = function () {
+      setInterval(function () {
+        if (
+          !msObj.LEFT_MOUSE_DOWN &&
+          !msObj.RIGHT_MOUSE_DOWN &&
+          msObj.board.find('.cell.test').length > 0
+        ) {
+          // Reset cell push down states periodically if mouse buttons are up
+          msObj.board.find('.cell').removeClass('test');
+        }
+      }, 150);
+    };
+
     this.initHandlers = function (msUI) {
       msUI.on('contextmenu', '.cell', function (ev) {
         ev.preventDefault();
+      });
+
+      msUI.on('mousemove', function (ev) {
+        let button = ev.button || 0;
+        let buttons = ev.buttons || 0;
+        if (button === 0 && buttons === 0) {
+          msObj.RIGHT_MOUSE_DOWN = false;
+          msObj.LEFT_MOUSE_DOWN = false;
+        }
       });
 
       msUI.on('mousedown', function (ev) {
@@ -156,14 +181,15 @@ jQuery(function ($) {
       });
 
       msUI.on('mousedown', '.cell', function (ev) {
-        var targ = $(ev.target);
+        let targ = $(ev.target);
         if (
           (ev.which === LEFT_MOUSE_BUTTON && msObj.RIGHT_MOUSE_DOWN) ||
           (ev.which === RIGHT_MOUSE_BUTTON && msObj.LEFT_MOUSE_DOWN)
         ) {
-          var x = targ.attr('data-x') - 1;
-          var ud = targ.parent().prev();
-          var i;
+          // This occurs when player is hold BOTH the left and right mouse buttons down simultaneously
+          let x = targ.attr('data-x') - 1;
+          let ud = targ.parent().prev();
+          let i;
 
           for (i = x; i < x + 3; i++) {
             ud.children('.unknown.[data-x=' + i + ']').addClass('test');
@@ -178,7 +204,7 @@ jQuery(function ($) {
       });
 
       msUI.on('mouseup', '.cell', function (ev) {
-        var targ = $(ev.target);
+        let targ = $(ev.target);
         if (ev.which === LEFT_MOUSE_BUTTON) {
           if (ev.shiftKey || ev.ctrlKey) {
             msObj.MODIFIER_KEY_DOWN = true;
@@ -206,7 +232,7 @@ jQuery(function ($) {
       });
 
       $('#level').on('change', function () {
-        var input = $('.game_settings input');
+        let input = $('.game_settings input');
         if ($('#level option:selected').val() === 'custom') {
           input.prop('disabled', false);
         } else {
@@ -215,16 +241,16 @@ jQuery(function ($) {
         $('.new-game').trigger('click');
       });
 
-      $('#best_times').on('click', function () {
-        var beginnerTime = localStorage.getItem('best_time_beginner') || 'None';
-        var intermediateTime =
+      $('#bestTimes').on('click', function () {
+        let beginnerTime = localStorage.getItem('best_time_beginner') || 'None';
+        let intermediateTime =
           localStorage.getItem('best_time_intermediate') || 'None';
-        var expertTime = localStorage.getItem('best_time_expert') || 'None';
-        var beginnerName =
+        let expertTime = localStorage.getItem('best_time_expert') || 'None';
+        let beginnerName =
           localStorage.getItem('beginner_record_holder') || 'None';
-        var intermediateName =
+        let intermediateName =
           localStorage.getItem('intermediate_record_holder') || 'None';
-        var expertName = localStorage.getItem('expert_record_holder') || 'None';
+        let expertName = localStorage.getItem('expert_record_holder') || 'None';
         alert(
           'Best times:\nBeginner:\t' +
             beginnerName +
@@ -255,7 +281,7 @@ jQuery(function ($) {
       if (!msObj.running) {
         return;
       }
-      var obj = msObj.getCellObj(cell);
+      let obj = msObj.getCellObj(cell);
 
       if (obj.state === STATE_NUMBER) {
         // auto clear neighbor cells
@@ -271,7 +297,7 @@ jQuery(function ($) {
       if (obj.state === STATE_QUESTION) {
         obj.state = STATE_UNKNOWN;
       } else {
-        var flagDisplay = $('#mine_flag_display'),
+        let flagDisplay = $('#mine_flag_display'),
           curr = parseInt(flagDisplay.val(), 10);
         if (obj.state === STATE_UNKNOWN) {
           obj.state = STATE_FLAGGED;
@@ -300,8 +326,13 @@ jQuery(function ($) {
       if (!msObj.timer) {
         msObj.startTimer();
       }
+      if (!msObj.minesDealt) {
+        let x = parseInt(cell.attr('data-x'), 10);
+        let y = parseInt(cell.attr('data-y'), 10);
+        msObj.assignMines(x, y);
+      }
 
-      var obj = msObj.getCellObj(cell);
+      let obj = msObj.getCellObj(cell);
       if (obj.state === STATE_OPEN || obj.state === STATE_FLAGGED) {
         // ignore clicks on these
         return;
@@ -343,7 +374,7 @@ jQuery(function ($) {
           msObj.winGame();
         }
       } else if (data.type === 'explode') {
-        var cell = msObj.getJqueryObject(data.cell.x, data.cell.y);
+        let cell = msObj.getJqueryObject(data.cell.x, data.cell.y);
         msObj.gameOver(cell);
       } else if (data.type === 'log') {
         if (console && console.log) {
@@ -355,7 +386,7 @@ jQuery(function ($) {
 
     // return memory representation for jQuery instance
     this.getCellObj = function (domObj) {
-      var gridobj, x, y;
+      let gridobj, x, y;
       try {
         x = parseInt(domObj.attr('data-x'), 10);
         y = parseInt(domObj.attr('data-y'), 10);
@@ -373,8 +404,8 @@ jQuery(function ($) {
       return msObj.board.find('.cell[data-coord="' + [x, y].join(',') + '"]');
     };
 
-    this.getRandomMineArray = function () {
-      var width = msObj.options.boardSize[0],
+    this.getRandomMineArray = function (safeX, safeY) {
+      let width = msObj.options.boardSize[0],
         height = msObj.options.boardSize[1],
         // Total Mines is a percentage of the total number of cells
         totalMines = msObj.options.numMines,
@@ -395,7 +426,7 @@ jQuery(function ($) {
       // shuffle array so it's like pulling out of a 'hat'
       // credit: http://sedition.com/perl/javascript-fy.html
       function fisherYates(myArray) {
-        var i = myArray.length,
+        let i = myArray.length,
           j,
           tempi,
           tempj;
@@ -411,25 +442,29 @@ jQuery(function ($) {
         }
       }
 
+      let safeIndex = safeX + safeY * width;
+      console.log('Safe Index = ' + safeIndex);
       do {
         fisherYates(array);
         infiniteLoop += 1;
-        if (infiniteLoop > 20) {
+        if (infiniteLoop > 999) {
+          // Try to shuffle until we get a board where the safe x/y does not have a mine.
+          // But after too many attempts, just bail out and let player lose.
           break;
         }
-      } while (array[0] === 1);
+      } while (array[safeIndex] === 1);
 
       return array;
     };
 
     // set the board size and mine density
     this.setBoardOptions = function () {
-      var level = $('#level').val();
+      let level = $('#level').val();
 
       if (level === 'custom') {
-        var dimX = parseInt($('#dim_x').val(), 10);
-        var dimY = parseInt($('#dim_y').val(), 10);
-        var numMines = parseInt($('#numMines').val(), 10);
+        let dimX = parseInt($('#dim_x').val(), 10);
+        let dimY = parseInt($('#dim_y').val(), 10);
+        let numMines = parseInt($('#numMines').val(), 10);
 
         // rationalise options JIC
         if (isNaN(dimX) || dimX === 0) {
@@ -461,11 +496,11 @@ jQuery(function ($) {
     };
 
     this.startTimer = function () {
-      var timerElement = $('#timer');
+      let timerElement = $('#timer');
       timerElement.val(0);
       console.log('starting timer');
       msObj.timer = window.setInterval(function () {
-        var curr = parseInt(timerElement.val(), 10);
+        let curr = parseInt(timerElement.val(), 10);
         timerElement.val(curr + 1);
       }, 1000);
     };
@@ -477,8 +512,8 @@ jQuery(function ($) {
     };
 
     this.resetDisplays = function () {
-      var level = $('#level option:selected').val();
-      var numMines;
+      let level = $('#level option:selected').val();
+      let numMines;
 
       if (level === 'custom') {
         numMines = $('#numMines').val();
@@ -490,15 +525,40 @@ jQuery(function ($) {
       $('#timer').val(0);
     };
 
-    // clear & initialize the internal cell memory grid
-    this.clearBoard = function () {
-      var width = msObj.options.boardSize[0],
+    /**
+     * Distribute the mines randomly, being careful to avoid the safeX and safeY coord, which is where the player
+     * first clicked.
+     * @param safeX
+     * @param safeY
+     */
+    this.assignMines = function (safeX, safeY) {
+      if (msObj.minesDealt) {
+        return;
+      }
+      let width = msObj.options.boardSize[0],
         height = msObj.options.boardSize[1],
+        mineHat = msObj.getRandomMineArray(safeX, safeY),
         x,
         y,
-        z = 0,
-        mineHat = msObj.getRandomMineArray();
+        z = 0;
 
+      for (y = 0; y < height; y++) {
+        for (x = 0; x < width; x++) {
+          msObj.grid[y][x].mine = mineHat[z++];
+        }
+      }
+
+      msObj.minesDealt = true;
+    };
+
+    // clear & initialize the internal cell memory grid
+    this.clearBoard = function () {
+      let width = msObj.options.boardSize[0],
+        height = msObj.options.boardSize[1],
+        x,
+        y;
+
+      msObj.minesDealt = false;
       msObj.grid = [];
       for (y = 0; y < height; y++) {
         msObj.grid[y] = [];
@@ -506,7 +566,7 @@ jQuery(function ($) {
           msObj.grid[y][x] = {
             state: STATE_UNKNOWN,
             number: 0,
-            mine: mineHat[z++],
+            mine: 0,
             x: x,
             y: y,
           };
@@ -561,7 +621,7 @@ jQuery(function ($) {
           throw 'Could not load ' + msObj.options.pathToCellToucher;
         }
 
-        var win = window.minesweeperCalculateWin(msObj.grid);
+        let win = window.minesweeperCalculateWin(msObj.grid);
         if (win) {
           msObj.winGame();
         }
@@ -569,7 +629,7 @@ jQuery(function ($) {
     };
 
     this.drawCell = function (x, y) {
-      var cell = null,
+      let cell = null,
         gridobj;
       if (x instanceof jQuery) {
         cell = x;
@@ -619,7 +679,7 @@ jQuery(function ($) {
     this.gameOver = function (cellParam) {
       msObj.stopTimer();
 
-      var width = msObj.options.boardSize[0],
+      let width = msObj.options.boardSize[0],
         height = msObj.options.boardSize[1],
         x,
         y;
@@ -647,22 +707,22 @@ jQuery(function ($) {
     this.winGame = function () {
       msObj.stopTimer();
       msObj.running = false;
-      var time = $('#timer').val();
+      let time = $('#timer').val();
       alert('You win!\nYour time: ' + time);
       msObj.checkBestTime(time);
     };
 
     this.checkBestTime = function (time) {
-      var level = $('#level').val();
+      let level = $('#level').val();
       if (level !== 'custom') {
-        var bestTime = localStorage.getItem('best_time_' + level);
+        let bestTime = localStorage.getItem('best_time_' + level);
 
         if (!bestTime || parseInt(time, 10) < parseInt(bestTime, 10)) {
-          var displayName = localStorage.getItem(level + '_record_holder');
+          let displayName = localStorage.getItem(level + '_record_holder');
           if (!displayName) {
             displayName = 'Your name';
           }
-          var name = window.prompt(
+          let name = window.prompt(
             'Congrats! You beat the best ' + level + ' time!',
             displayName
           );
@@ -674,7 +734,7 @@ jQuery(function ($) {
     };
 
     this.getTemplate = function (template) {
-      var templates = {
+      let templates = {
         settings:
           '<div class="game_settings"><select id="level"><option value="beginner">Beginner</option>' +
           '<option value="intermediate">Intermediate</option><option value="expert">Expert</option>' +
