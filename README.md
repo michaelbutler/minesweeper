@@ -6,7 +6,7 @@ By Michael Butler
 
 A WebWorker powered Minesweeper game written in JavaScript, HTML and CSS.
 
-Demo: http://michaelbutler.github.io/minesweeper/
+Demo: https://michaelbutler.github.io/minesweeper/
 
 ## Features:
 
