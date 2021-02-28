@@ -1,11 +1,11 @@
+dist: focal
 language: node_js
-node_js:
-  - "4.4.7"
+services:
+  - docker
 before_install:
-  - npm install -g grunt-cli
-  # - npm install
-  # - npm install -g bower
-  # - bower install
+  - make build-ci
+script:
+  - make travis
 notifications:
   email:
     on_success: never

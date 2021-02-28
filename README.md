@@ -1,27 +1,27 @@
-Minesweeper.js
-===========
+# Minesweeper.js
+
 [![Build Status](https://travis-ci.org/michaelbutler/minesweeper.svg?branch=master)](https://travis-ci.org/michaelbutler/minesweeper)
 
 By Michael Butler
 
-A WebWorker powered Minesweeper game written in JavaScript, HTML and CSS. 
+A WebWorker powered Minesweeper game written in JavaScript, HTML and CSS.
 
 Demo: http://michaelbutler.github.io/minesweeper/
 
-Features:
------------
-+ User can choose difficulty level
-+ Custom option with configurable grid size (X, Y) and number of mines
-+ Stopwatch with score keeping (LocalStorage)
-+ Stack based grid traversal algorithm for memory efficiency
-+ HTML5 web worker (if supported) will be used to perform the stack algorithm outside of the UI thread
+## Features:
 
-How to use:
------------
+- User can choose difficulty level
+- Custom option with configurable grid size (X, Y) and number of mines
+- Stopwatch with score keeping (LocalStorage)
+- Stack based grid traversal algorithm for memory efficiency
+- HTML5 web worker (if supported) will be used to perform the stack algorithm outside of the UI thread
+
+## How to use:
+
 Download all the files and open `index.html` in a modern web browser.
 
-Example HTML usage:
------------
+## Example HTML usage:
+
 ```
 <!-- requires jQuery -->
 <h1 class="logo">JavaScript MineSweeper
@@ -37,19 +37,17 @@ Example HTML usage:
 </script>
 ```
 
-To Do:
------------
-+ Add animation and better graphics
-+ Enhance UI for a sleek new look
+## To Do:
 
+- Add animation and better graphics
+- Enhance UI for a sleek new look
 
-Contributing:
------------
+## Contributing:
+
 See [CONTRIBUTE.md](https://github.com/michaelbutler/minesweeper/blob/master/CONTRIBUTE.md) for how to contribute.
 
+## License:
 
-License:
------------
     Minesweeper.js is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
