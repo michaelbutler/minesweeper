@@ -2,3 +2,5 @@ build
 coverage
 .idea
 node_modules
+
+css/smoothness
