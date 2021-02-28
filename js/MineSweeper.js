@@ -22,7 +22,7 @@
  along with Minesweeper.js.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-window.MineSweeper = {};
+var MineSweeper;
 
 jQuery(function ($) {
   'use strict';
@@ -55,7 +55,7 @@ jQuery(function ($) {
   let MAX_X = 30,
     MAX_Y = 30;
 
-  window.MineSweeper = function () {
+  MineSweeper = function () {
     // prevent namespace pollution
     if (!(this instanceof MineSweeper)) {
       throw 'Invalid use of Minesweeper';
@@ -64,7 +64,8 @@ jQuery(function ($) {
     this.options = {};
     this.grid = [];
     this.running = true;
-    this.minesDealt = false; // Controls whether mines were assigned to cells yet. First click should always be safe.
+    // Controls whether mines were assigned to cells yet. First click should always be safe.
+    this.minesDealt = false;
     this.defaults = {
       selector: '#minesweeper',
       boardSize: levels.beginner.boardSize,
@@ -132,7 +133,11 @@ jQuery(function ($) {
 
     this.initCleanUpTimer = function () {
       setInterval(function () {
-        if (!msObj.LEFT_MOUSE_DOWN && !msObj.RIGHT_MOUSE_DOWN && msObj.board.find('.cell.test').length > 0) {
+        if (
+          !msObj.LEFT_MOUSE_DOWN &&
+          !msObj.RIGHT_MOUSE_DOWN &&
+          msObj.board.find('.cell.test').length > 0
+        ) {
           // Reset cell push down states periodically if mouse buttons are up
           msObj.board.find('.cell').removeClass('test');
         }
@@ -399,7 +404,7 @@ jQuery(function ($) {
       return msObj.board.find('.cell[data-coord="' + [x, y].join(',') + '"]');
     };
 
-    this.getRandomMineArray = function (safe_x, safe_y) {
+    this.getRandomMineArray = function (safeX, safeY) {
       let width = msObj.options.boardSize[0],
         height = msObj.options.boardSize[1],
         // Total Mines is a percentage of the total number of cells
@@ -437,8 +442,8 @@ jQuery(function ($) {
         }
       }
 
-      let safe_index = safe_x + (safe_y * width);
-      console.log("Safe Index = " + safe_index);
+      let safeIndex = safeX + safeY * width;
+      console.log('Safe Index = ' + safeIndex);
       do {
         fisherYates(array);
         infiniteLoop += 1;
@@ -447,7 +452,7 @@ jQuery(function ($) {
           // But after too many attempts, just bail out and let player lose.
           break;
         }
-      } while (array[safe_index] === 1);
+      } while (array[safeIndex] === 1);
 
       return array;
     };
@@ -521,25 +526,25 @@ jQuery(function ($) {
     };
 
     /**
-     * Distribute the mines randomly, being careful to avoid the safe_x and safe_y coord, which is where the player
+     * Distribute the mines randomly, being careful to avoid the safeX and safeY coord, which is where the player
      * first clicked.
-     * @param safe_x
-     * @param safe_y
+     * @param safeX
+     * @param safeY
      */
-    this.assignMines = function (safe_x, safe_y) {
+    this.assignMines = function (safeX, safeY) {
       if (msObj.minesDealt) {
         return;
       }
       let width = msObj.options.boardSize[0],
         height = msObj.options.boardSize[1],
-        mineHat = msObj.getRandomMineArray(safe_x, safe_y),
+        mineHat = msObj.getRandomMineArray(safeX, safeY),
         x,
         y,
         z = 0;
 
       for (y = 0; y < height; y++) {
         for (x = 0; x < width; x++) {
-          msObj.grid[y][x]['mine'] = mineHat[z++];
+          msObj.grid[y][x].mine = mineHat[z++];
         }
       }
 
