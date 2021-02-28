@@ -186,7 +186,7 @@ jQuery(function ($) {
           (ev.which === LEFT_MOUSE_BUTTON && msObj.RIGHT_MOUSE_DOWN) ||
           (ev.which === RIGHT_MOUSE_BUTTON && msObj.LEFT_MOUSE_DOWN)
         ) {
-          // This occurs when player is hold BOTH the left and right mouse buttons down simultaneously
+          // This occurs when player is holding BOTH the left and right mouse buttons down simultaneously
           let x = targ.attr('data-x') - 1;
           let ud = targ.parent().prev();
           let i;
@@ -225,6 +225,8 @@ jQuery(function ($) {
         msObj.stopTimer();
         msObj.timer = '';
         msObj.running = true;
+        msObj.paused = false;
+        msObj.board.removeClass('paused');
         msObj.setBoardOptions();
         msObj.clearBoard();
         msObj.redrawBoard();
@@ -251,22 +253,18 @@ jQuery(function ($) {
         let intermediateName =
           localStorage.getItem('intermediate_record_holder') || 'None';
         let expertName = localStorage.getItem('expert_record_holder') || 'None';
-        alert(
-          'Best times:\nBeginner:\t' +
-            beginnerName +
-            '\t' +
-            beginnerTime +
-            '\n' +
-            'Intermediate:\t' +
-            intermediateName +
-            '\t' +
-            intermediateTime +
-            '\n' +
-            'Expert:\t' +
-            expertName +
-            '\t' +
-            expertTime
-        );
+        alert('Best times:\nBeginner:     ' + beginnerName + ' : ' + beginnerTime + '\n' +
+          'Intermediate: ' + intermediateName + ' : ' + intermediateTime + '\n' +
+          'Expert:       ' + expertName + ' : ' + expertTime);
+      });
+
+      $('.msPause').on('click', function (ev) {
+        ev.preventDefault();
+        if (msObj.paused) {
+          msObj.resumeGame();
+        } else if(msObj.timer) {
+          msObj.pauseGame();
+        }
       });
     };
 
@@ -365,6 +363,25 @@ jQuery(function ($) {
       }
     };
 
+    this.pauseGame = function () {
+      // hide board so they can't cheat
+      msObj.board.addClass('paused');
+      // pause stopwatch
+      msObj.stopTimer();
+      // toggle button
+      $('.msPause').html('Resume');
+      msObj.paused = true;
+    };
+
+    this.resumeGame = function () {
+      // show board
+      msObj.board.removeClass('paused');
+      // resume stopwatch
+      msObj.resumeTimer();
+      // toggle button
+      msObj.paused = false;
+    };
+
     this.handleWorkerMessage = function (data) {
       if (data.type === 'touch_adjacent' || data.type === 'get_adjacent') {
         msObj.grid = data.grid;
@@ -447,8 +464,7 @@ jQuery(function ($) {
         fisherYates(array);
         infiniteLoop += 1;
         if (infiniteLoop > 999) {
-          // Try to shuffle until we get a board where the safe x/y does not have a mine.
-          // But after too many attempts, just bail out and let player lose.
+          console.warn('Giving up trying to prevent initial space from blowing up');
           break;
         }
       } while (array[safeIndex] === 1);
@@ -497,17 +513,28 @@ jQuery(function ($) {
     this.startTimer = function () {
       let timerElement = $('#timer');
       timerElement.val(0);
-      console.log('starting timer');
-      msObj.timer = window.setInterval(function () {
+      $('.msPause').show();
+      msObj.resumeTimer();
+      /*msObj.timer = window.setInterval(function () {
         let curr = parseInt(timerElement.val(), 10);
         timerElement.val(curr + 1);
-      }, 1000);
+      }, 1000);*/
     };
 
     this.stopTimer = function () {
       if (msObj.timer) {
         window.clearInterval(msObj.timer);
       }
+    };
+
+    this.resumeTimer = function () {
+      $('.msPause').html('Pause');
+      let timerElement = $('#timer');
+      console.log('resuming timer');
+      msObj.timer = window.setInterval(function () {
+        let curr = parseInt(timerElement.val(), 10);
+        timerElement.val(curr + 1);
+      }, 1000);
     };
 
     this.resetDisplays = function () {
@@ -522,6 +549,7 @@ jQuery(function ($) {
 
       $('#mine_flag_display').val(numMines);
       $('#timer').val(0);
+      $('.msPause').hide();
     };
 
     /**
@@ -677,6 +705,7 @@ jQuery(function ($) {
      */
     this.gameOver = function (cellParam) {
       msObj.stopTimer();
+      $('.msPause').hide();
 
       let width = msObj.options.boardSize[0],
         height = msObj.options.boardSize[1],
@@ -705,6 +734,7 @@ jQuery(function ($) {
 
     this.winGame = function () {
       msObj.stopTimer();
+      $('.msPause').hide();
       msObj.running = false;
       let time = $('#timer').val();
       alert('You win!\nYour time: ' + time);
@@ -713,43 +743,53 @@ jQuery(function ($) {
 
     this.checkBestTime = function (time) {
       let level = $('#level').val();
-      if (level !== 'custom') {
-        let bestTime = localStorage.getItem('best_time_' + level);
-
-        if (!bestTime || parseInt(time, 10) < parseInt(bestTime, 10)) {
-          let displayName = localStorage.getItem(level + '_record_holder');
-          if (!displayName) {
-            displayName = 'Your name';
-          }
-          let name = window.prompt(
-            'Congrats! You beat the best ' + level + ' time!',
-            displayName
-          );
-
-          localStorage.setItem('best_time_' + level, time);
-          localStorage.setItem(level + '_record_holder', name);
+      if (level === 'custom') {
+        return;
+      }
+      let bestTime = localStorage.getItem('best_time_' + level);
+      if (!bestTime || parseInt(time, 10) < parseInt(bestTime, 10)) {
+        let displayName = localStorage.getItem(level + '_record_holder');
+        if (!displayName) {
+          displayName = localStorage.getItem('beginner_record_holder');
         }
+        if (!displayName) {
+          displayName = localStorage.getItem('intermediate_record_holder');
+        }
+        if (!displayName) {
+          displayName = localStorage.getItem('expert_record_holder');
+        }
+        if (!displayName) {
+          displayName = 'Your name';
+        }
+        let name = window.prompt(
+          'Congrats! You beat the best ' + level + ' time!',
+          displayName
+        );
+
+        localStorage.setItem('best_time_' + level, time);
+        localStorage.setItem(level + '_record_holder', name);
       }
     };
 
     this.getTemplate = function (template) {
       let templates = {
         settings:
-          '<div class="game_settings"><select id="level"><option value="beginner">Beginner</option>' +
+          '<div class="game_settings"><select id="level" class="msLevel"><option value="beginner">Beginner</option>' +
           '<option value="intermediate">Intermediate</option><option value="expert">Expert</option>' +
           '<option value="custom">Custom</option></select>' +
-          '<input type="text" id="dim_x" placeholder="x" size="5" disabled value="20" />' +
-          '<input type="text" id="dim_y" placeholder="y" size="5" disabled value="20" />' +
-          '<input type="text" id="numMines" placeholder="mines" size="5" disabled />' +
+          '<input type="text" id="dim_x" class="msDimX" placeholder="x" size="5" disabled value="20" />' +
+          '<input type="text" id="dim_y" class="msDimY" placeholder="y" size="5" disabled value="20" />' +
+          '<input type="text" id="numMines" class="msNumMines" placeholder="mines" size="5" disabled />' +
           '</div>',
         actions:
           '<div class="game_actions"><button class="new-game">New Game</button>' +
-          '<button id="bestTimes">Best times</button></div>',
+          '<button id="bestTimes">Best times</button></div>' +
+          '<button id="pause" class="msPause">Pause</button></div>',
         status:
           '<div class="game_status"><label>Time:</label>' +
-          '<input type="text" id="timer" size="6" value="0" readonly />' +
+          '<input type="text" id="timer" class="msTimer" size="6" value="0" readonly />' +
           '<label>Mines:</label>' +
-          '<input type="text" id="mine_flag_display" size="6" value="10" disabled />',
+          '<input type="text" id="mine_flag_display" class="msMineFlagDisplay" size="6" value="10" disabled />',
       };
 
       return templates[template];
