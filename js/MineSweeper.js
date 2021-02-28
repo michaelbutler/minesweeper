@@ -443,7 +443,6 @@ jQuery(function ($) {
       }
 
       let safeIndex = safeX + safeY * width;
-      console.log('Safe Index = ' + safeIndex);
       do {
         fisherYates(array);
         infiniteLoop += 1;
