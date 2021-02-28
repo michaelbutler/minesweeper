@@ -1,6 +1,6 @@
 # Minesweeper.js
 
-[![Build Status](https://api.travis-ci.com/michaelbutler/minesweeper.svg?branch=master)](https://travis-ci.org/michaelbutler/minesweeper)
+[![Build Status](https://api.travis-ci.com/michaelbutler/minesweeper.svg?branch=master)](https://travis-ci.com/michaelbutler/minesweeper)
 
 By Michael Butler
 
