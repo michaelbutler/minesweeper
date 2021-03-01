@@ -39,6 +39,15 @@ h1 {
   -webkit-user-select: none;
   user-select: none;
   cursor: default;
+  background-image: none;
+}
+
+.board-wrap.paused {
+  background: url(../images/paused.png) no-repeat 12px 22px;
+}
+
+.board-wrap.paused ul {
+  visibility: hidden;
 }
 
 .board-wrap .row {
@@ -89,8 +98,8 @@ h1 {
 }
 
 .board-wrap .row .cell.explode {
-  color: red;
-  background-color: white;
+  color: white;
+  background-color: red;
 }
 
 .board-wrap .cell.unknown:active {
@@ -117,6 +126,21 @@ h1 {
 }
 .cell[data-number='3'] {
   color: red;
+}
+.cell[data-number='4'] {
+  color: darkblue;
+}
+.cell[data-number='5'] {
+  color: darkblue;
+}
+.cell[data-number='6'] {
+  color: darkblue;
+}
+.cell[data-number='7'] {
+  color: darkblue;
+}
+.cell[data-number='8'] {
+  color: darkblue;
 }
 
 .game_settings,

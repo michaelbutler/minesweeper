@@ -1,12 +1,15 @@
 # Minesweeper.js
 
-[![Build Status](https://api.travis-ci.com/michaelbutler/minesweeper.svg?branch=master)](https://travis-ci.org/michaelbutler/minesweeper)
+[![Build Status](https://api.travis-ci.com/michaelbutler/minesweeper.svg?branch=master)](https://travis-ci.com/michaelbutler/minesweeper)
 
 By Michael Butler
 
-A WebWorker powered Minesweeper game written in JavaScript, HTML and CSS.
+A WebWorker powered Minesweeper game written in JavaScript, HTML and CSS. Yes, using webworkers
+just for minesweepr might be overkill but for when this was first written around 2013 it actually
+made a visible difference in Firefox at least. But it is also an exercise to
+understand how they work and pass messages between the main UI thread and the background thread.
 
-Demo: http://michaelbutler.github.io/minesweeper/
+Demo: https://michaelbutler.github.io/minesweeper/
 
 ## Features:
 
@@ -46,7 +49,7 @@ Download all the files and open `index.html` in a modern web browser.
 
 See [CONTRIBUTE.md](https://github.com/michaelbutler/minesweeper/blob/master/CONTRIBUTE.md) for how to contribute.
 
-## License:
+## License (GPL v3):
 
     Minesweeper.js is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
